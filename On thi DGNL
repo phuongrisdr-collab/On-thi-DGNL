@@ -1,0 +1,1849 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luyện thi Đánh giá Năng lực Y khoa - MCQ & Tự luận ngắn (SAQ)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        navy: {
+                            800: '#1e3a5f',
+                            900: '#0f2537',
+                            950: '#091724',
+                        },
+                        teal: {
+                            600: '#0d9488',
+                            700: '#0f766e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom scrollbar for comfortable clinical reading */
+        ::-webkit-scrollbar {
+            width: 7px;
+            height: 7px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Strikethrough styling for eliminated MCQ options */
+        .option-eliminated .option-text {
+            text-decoration: line-through;
+            color: #94a3b8;
+        }
+        .option-eliminated {
+            opacity: 0.65;
+            background-color: #f8fafc !important;
+        }
+
+        .transition-all-fast {
+            transition: all 0.15s ease-in-out;
+        }
+
+        ::selection {
+            background-color: #fef08a;
+            color: #0f172a;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans antialiased flex flex-col min-h-screen lg:h-screen lg:overflow-hidden">
+
+    <!-- TOP HEADER (Study & Practice Focused) -->
+    <header class="bg-navy-900 text-white shadow-md z-30 flex-shrink-0 border-b border-navy-800">
+        <div class="max-w-full mx-auto px-3 sm:px-5 py-2.5 flex flex-wrap items-center justify-between gap-2">
+            
+            <!-- Left: Brand & Progress -->
+            <div class="flex items-center space-x-3">
+                <div class="bg-teal-600 p-2 rounded-xl flex items-center justify-center shadow-inner">
+                    <i class="fa-solid fa-user-doctor text-white text-lg"></i>
+                </div>
+                <div>
+                    <div class="flex items-center space-x-2">
+                        <h1 class="font-bold text-sm sm:text-base tracking-tight leading-tight text-white">
+                            Luyện thi Đánh giá Năng lực Y khoa
+                        </h1>
+                        <span class="hidden sm:inline-block text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-teal-500/20 text-teal-300 border border-teal-500/30">
+                            Chế độ Luyện thi
+                        </span>
+                    </div>
+                    <div class="flex items-center space-x-2 text-xs text-slate-300 mt-0.5">
+                        <span id="question-counter" class="font-semibold text-teal-300">Câu 1 / 8</span>
+                        <span>•</span>
+                        <span id="current-q-id" class="font-mono text-slate-400">ID: #NOI-01</span>
+                        <span>•</span>
+                        <span id="live-score-pill" class="text-emerald-300 font-medium">Đã đạt: 0/0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Center Controls: Specialty Filter & Question Type Filter -->
+            <div class="flex flex-wrap items-center gap-2 order-3 lg:order-2 w-full lg:w-auto justify-between lg:justify-center border-t lg:border-t-0 border-navy-800 pt-2 lg:pt-0">
+                <!-- Specialty Filter -->
+                <div class="flex items-center bg-navy-800 rounded-lg px-2.5 py-1.5 border border-slate-700">
+                    <i class="fa-solid fa-hospital-user text-teal-400 text-xs mr-1.5"></i>
+                    <select id="specialty-filter" onchange="applyFilters()" class="bg-transparent text-xs text-white font-medium focus:outline-none cursor-pointer">
+                        <option value="ALL" class="bg-navy-900 text-white">Tất cả chuyên khoa</option>
+                        <option value="Nội khoa" class="bg-navy-900 text-white">Nội khoa</option>
+                        <option value="Ngoại khoa" class="bg-navy-900 text-white">Ngoại khoa</option>
+                        <option value="Sản phụ khoa" class="bg-navy-900 text-white">Sản phụ khoa</option>
+                        <option value="Nhi khoa" class="bg-navy-900 text-white">Nhi khoa</option>
+                    </select>
+                </div>
+
+                <!-- Question Type Filter (All / MCQ / SAQ) -->
+                <div class="flex items-center bg-navy-800 rounded-lg px-2.5 py-1.5 border border-slate-700">
+                    <i class="fa-solid fa-layer-group text-amber-400 text-xs mr-1.5"></i>
+                    <select id="type-filter" onchange="applyFilters()" class="bg-transparent text-xs text-white font-medium focus:outline-none cursor-pointer">
+                        <option value="ALL" class="bg-navy-900 text-white">Tất cả dạng câu (MCQ + Tự luận)</option>
+                        <option value="mcq" class="bg-navy-900 text-white">Chỉ Trắc nghiệm (MCQ)</option>
+                        <option value="saq" class="bg-navy-900 text-white">Chỉ Tự luận ngắn (SAQ)</option>
+                    </select>
+                </div>
+
+                <!-- Utility Buttons: Lab Values & Import JSON -->
+                <div class="flex items-center gap-1.5">
+                    <button onclick="openModal('lab-modal')" class="bg-navy-800 hover:bg-slate-700 text-slate-200 border border-slate-600 px-2.5 py-1.5 rounded-lg text-xs font-medium flex items-center transition-all-fast" title="Tra cứu giá trị tham chiếu xét nghiệm">
+                        <i class="fa-solid fa-flask-vial text-teal-400 mr-1.5"></i>
+                        <span class="hidden sm:inline">Giá trị tham chiếu</span>
+                        <span class="sm:hidden">Labs</span>
+                    </button>
+                    <button onclick="openModal('import-modal')" class="bg-navy-800 hover:bg-slate-700 text-slate-200 border border-slate-600 px-2.5 py-1.5 rounded-lg text-xs font-medium flex items-center transition-all-fast" title="Nhập bộ câu hỏi JSON từ AI">
+                        <i class="fa-solid fa-file-import text-amber-400 mr-1.5"></i>
+                        <span class="hidden sm:inline">Nhập đề JSON</span>
+                        <span class="sm:hidden">JSON</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Right: Study Stopwatch & Review Dashboard Button -->
+            <div class="flex items-center space-x-2 order-2 lg:order-3">
+                <!-- Study Stopwatch (Count-up for practice pacing) -->
+                <div class="hidden sm:flex items-center bg-navy-950 border border-slate-700 rounded-lg px-2.5 py-1.5" title="Thời gian luyện tập">
+                    <i class="fa-regular fa-clock text-teal-400 text-xs mr-1.5"></i>
+                    <span id="stopwatch-display" class="font-mono text-xs font-semibold text-white tracking-wider">00:00</span>
+                    <button id="btn-timer-toggle" onclick="toggleStopwatch()" class="ml-2 text-slate-400 hover:text-white text-xs" title="Tạm dừng / Tiếp tục">
+                        <i class="fa-solid fa-pause"></i>
+                    </button>
+                </div>
+
+                <!-- Summary Dashboard Button -->
+                <button onclick="openReviewDashboard()" class="bg-teal-600 hover:bg-teal-700 text-white font-semibold text-xs px-3 py-1.5 rounded-lg shadow transition-all-fast flex items-center">
+                    <i class="fa-solid fa-chart-pie mr-1.5"></i>
+                    <span>Tổng kết luyện thi</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- TOP QUESTION NAVIGATOR STRIP -->
+        <div class="bg-navy-950/90 border-t border-navy-800 px-3 sm:px-5 py-2 flex flex-col sm:flex-row items-center justify-between gap-2">
+            <div class="flex items-center space-x-1.5 overflow-x-auto max-w-full py-0.5" id="question-navigator">
+                <!-- Dynamic question pills injected here -->
+            </div>
+
+            <!-- Legend -->
+            <div class="flex items-center space-x-3 text-[11px] text-slate-400 flex-shrink-0">
+                <span class="flex items-center"><i class="fa-solid fa-list-ul text-sky-400 mr-1 text-[10px]"></i>Trắc nghiệm</span>
+                <span class="flex items-center"><i class="fa-solid fa-pen-nib text-purple-400 mr-1 text-[10px]"></i>Tự luận</span>
+                <span class="text-slate-600">|</span>
+                <span class="flex items-center"><span class="w-2.5 h-2.5 rounded-sm bg-emerald-500 inline-block mr-1"></span>Đạt</span>
+                <span class="flex items-center"><span class="w-2.5 h-2.5 rounded-sm bg-rose-500 inline-block mr-1"></span>Chưa đạt</span>
+                <span class="flex items-center"><i class="fa-solid fa-flag text-amber-400 mr-1"></i>Cắm cờ</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- SUB-TOOLBAR: Flag, Clinical Hint & Font Size Controls -->
+    <div class="bg-slate-200 border-b border-slate-300 px-4 py-1.5 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-600 flex-shrink-0">
+        <div class="flex items-center space-x-2">
+            <!-- Flag Question -->
+            <button id="btn-flag" onclick="toggleFlagCurrent()" class="flex items-center space-x-1.5 px-2.5 py-1 rounded-md border border-slate-300 bg-white hover:bg-amber-50 text-slate-700 font-medium transition-all-fast">
+                <i class="fa-regular fa-flag text-amber-600"></i>
+                <span>Cắm cờ xem lại</span>
+            </button>
+
+            <!-- Clinical Hint Toggle -->
+            <button id="btn-hint" onclick="toggleClinicalHint()" class="flex items-center space-x-1.5 px-2.5 py-1 rounded-md border border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-800 font-semibold transition-all-fast">
+                <i class="fa-regular fa-lightbulb text-amber-600"></i>
+                <span>Gợi ý lâm sàng</span>
+            </button>
+        </div>
+
+        <!-- Font size adjusters for Clinical Vignette -->
+        <div class="flex items-center space-x-1.5">
+            <span class="text-slate-500 hidden sm:inline">Cỡ chữ ca bệnh:</span>
+            <button onclick="changeFontSize(-1)" class="w-7 h-7 bg-white border border-slate-300 rounded hover:bg-slate-100 font-bold text-slate-700 flex items-center justify-center" title="Giảm cỡ chữ">A-</button>
+            <button onclick="changeFontSize(0)" class="w-7 h-7 bg-white border border-slate-300 rounded hover:bg-slate-100 font-medium text-slate-700 flex items-center justify-center" title="Cỡ chữ mặc định">A</button>
+            <button onclick="changeFontSize(1)" class="w-7 h-7 bg-white border border-slate-300 rounded hover:bg-slate-100 font-bold text-slate-700 flex items-center justify-center" title="Tăng cỡ chữ">A+</button>
+        </div>
+    </div>
+
+    <!-- MAIN SPLIT-SCREEN WORKSPACE -->
+    <main class="flex-1 flex flex-col lg:flex-row lg:overflow-hidden">
+        
+        <!-- LEFT COLUMN: CLINICAL VIGNETTE & LABS -->
+        <section id="vignette-pane" class="w-full lg:w-1/2 bg-white border-b lg:border-b-0 lg:border-r border-slate-300 lg:overflow-y-auto p-4 sm:p-6 lg:p-8">
+            <div class="max-w-3xl mx-auto">
+                <!-- Specialty & Question Type Badges -->
+                <div class="flex flex-wrap items-center justify-between gap-2 mb-4 pb-3 border-b border-slate-200">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span id="q-specialty-badge" class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-teal-50 text-teal-700 border border-teal-200">
+                            Nội khoa
+                        </span>
+                        <span id="q-type-badge" class="px-2.5 py-1 rounded-full text-xs font-bold bg-sky-50 text-sky-700 border border-sky-200">
+                            <i class="fa-solid fa-list-ul mr-1"></i>Trắc nghiệm (MCQ)
+                        </span>
+                    </div>
+                    <span class="text-xs text-slate-500 font-mono" id="q-topic-tag">Chủ đề: Tim mạch</span>
+                </div>
+
+                <!-- Vignette Text Container -->
+                <div id="vignette-content" class="text-base leading-relaxed text-slate-800 space-y-4">
+                    <!-- Dynamic clinical history injected here -->
+                </div>
+
+                <!-- Laboratory / Imaging Results Table with Highlight Toggle -->
+                <div id="labs-container" class="mt-6 bg-slate-50 border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+                    <div class="bg-slate-100 px-4 py-2.5 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center">
+                            <i class="fa-solid fa-microscope text-teal-700 mr-2"></i>
+                            Cận lâm sàng & Thăm dò
+                        </h3>
+                        <div class="flex items-center space-x-3">
+                            <!-- Toggle Highlight Abnormal Values -->
+                            <button id="btn-toggle-abnormal" onclick="toggleHighlightAbnormal()" class="text-xs px-2.5 py-1 rounded-md border font-medium transition-all-fast flex items-center bg-rose-50 border-rose-200 text-rose-700">
+                                <i class="fa-solid fa-highlighter mr-1.5"></i>
+                                <span id="highlight-abnormal-text">Đang tô màu bất thường</span>
+                            </button>
+                            <button onclick="openModal('lab-modal')" class="text-xs text-teal-700 hover:underline font-semibold">
+                                Bảng tham chiếu
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-0 overflow-x-auto">
+                        <table class="w-full text-sm text-left">
+                            <thead class="bg-slate-50 text-slate-500 text-xs uppercase border-b border-slate-200">
+                                <tr>
+                                    <th class="px-4 py-2 font-semibold">Xét nghiệm / Thăm dò</th>
+                                    <th class="px-4 py-2 font-semibold">Kết quả</th>
+                                    <th class="px-4 py-2 font-semibold hidden sm:table-cell">Tham chiếu</th>
+                                </tr>
+                            </thead>
+                            <tbody id="labs-table-body" class="divide-y divide-slate-200 font-mono text-xs sm:text-sm">
+                                <!-- Dynamic lab rows injected here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RIGHT COLUMN: LEAD-IN QUESTION, INTERACTION AREA (MCQ or SAQ) & EXPLANATION -->
+        <section id="question-pane" class="w-full lg:w-1/2 bg-slate-50 lg:overflow-y-auto p-4 sm:p-6 lg:p-8 flex flex-col justify-between">
+            <div class="max-w-3xl mx-auto w-full space-y-5">
+                
+                <!-- Clinical Hint Callout (Hidden by default) -->
+                <div id="clinical-hint-box" class="hidden bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-xl shadow-sm text-sm text-amber-950">
+                    <div class="flex items-start space-x-2.5">
+                        <i class="fa-solid fa-lightbulb text-amber-600 mt-0.5"></i>
+                        <div>
+                            <span class="font-bold uppercase text-xs tracking-wider text-amber-800 block mb-1">Gợi ý định hướng tư duy lâm sàng:</span>
+                            <p id="clinical-hint-text" class="leading-relaxed"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lead-in Question Card -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                    <div class="flex items-start space-x-3">
+                        <span id="question-pill-label" class="bg-navy-900 text-white font-bold text-xs px-2.5 py-1 rounded mt-0.5 flex-shrink-0">CÂU HỎI</span>
+                        <h2 id="lead-in-question" class="text-base sm:text-lg font-bold text-navy-950 leading-snug">
+                            <!-- Dynamic lead-in question -->
+                        </h2>
+                    </div>
+                </div>
+
+                <!-- AREA A: MULTIPLE CHOICE OPTIONS (Shown when type === 'mcq') -->
+                <div id="mcq-interaction-area" class="space-y-3">
+                    <div class="flex items-center justify-between text-xs text-slate-500 px-1">
+                        <span>Chọn 1 phương án đúng nhất:</span>
+                        <span class="hidden sm:inline"><i class="fa-solid fa-computer-mouse mr-1"></i>Chuột phải hoặc bấm <i class="fa-solid fa-strikethrough mx-0.5"></i> để loại trừ</span>
+                    </div>
+                    <div id="options-list" class="space-y-3">
+                        <!-- Dynamic option buttons A, B, C, D -->
+                    </div>
+                </div>
+
+                <!-- AREA B: SHORT ANSWER INPUT (Shown when type === 'saq') -->
+                <div id="saq-interaction-area" class="hidden space-y-3">
+                    <div class="bg-white p-5 rounded-xl border-2 border-purple-200 shadow-sm space-y-3">
+                        <div class="flex items-center justify-between">
+                            <label for="saq-user-input" class="text-xs font-bold uppercase tracking-wider text-purple-800 flex items-center">
+                                <i class="fa-solid fa-pen-to-square mr-1.5"></i>Câu trả lời của bạn (Tự luận ngắn)
+                            </label>
+                            <span id="saq-prompt-hint" class="text-xs text-slate-400">Nhập ngắn gọn, súc tích các ý chính</span>
+                        </div>
+                        <textarea id="saq-user-input" rows="4" oninput="handleSaqInput(this.value)" placeholder="Nhập chẩn đoán xác định, xét nghiệm đầu tay hoặc phác đồ xử trí của bạn tại đây..." class="w-full p-3.5 text-sm sm:text-base text-slate-800 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:border-purple-600 focus:bg-white transition-colors"></textarea>
+                        
+                        <!-- Keyword Match Live Feedback (Shown after grading) -->
+                        <div id="saq-keyword-feedback" class="hidden pt-2 border-t border-slate-100">
+                            <div class="text-xs font-semibold text-slate-600 mb-1.5">Đối chiếu từ khóa chuyên môn tự động:</div>
+                            <div id="saq-keyword-badges" class="flex flex-wrap gap-1.5">
+                                <!-- Dynamic matched/missed keyword chips -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons Row -->
+                <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
+                    <div class="flex items-center space-x-2">
+                        <button id="btn-prev" onclick="prevQuestion()" class="px-4 py-2.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 font-medium text-sm transition-all-fast flex items-center disabled:opacity-40 disabled:cursor-not-allowed">
+                            <i class="fa-solid fa-chevron-left mr-2"></i>Câu trước
+                        </button>
+                        <button id="btn-next" onclick="nextQuestion()" class="px-4 py-2.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 font-medium text-sm transition-all-fast flex items-center disabled:opacity-40 disabled:cursor-not-allowed">
+                            Câu tiếp<i class="fa-solid fa-chevron-right ml-2"></i>
+                        </button>
+                    </div>
+
+                    <div class="flex items-center space-x-2">
+                        <!-- Reset current question button -->
+                        <button id="btn-retry-single" onclick="retryCurrentQuestion()" class="hidden px-3.5 py-2.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-100 text-slate-600 font-medium text-xs sm:text-sm transition-all-fast" title="Làm lại câu này">
+                            <i class="fa-solid fa-rotate-left mr-1.5"></i>Làm lại câu này
+                        </button>
+
+                        <!-- Grade / Check Answer Button -->
+                        <button id="btn-check-answer" onclick="checkCurrentAnswer()" class="px-5 py-2.5 rounded-lg bg-teal-600 hover:bg-teal-700 text-white font-semibold text-sm shadow-sm transition-all-fast flex items-center">
+                            <i class="fa-solid fa-check-double mr-2"></i>Kiểm tra đáp án
+                        </button>
+                    </div>
+                </div>
+
+                <!-- EXPLANATION & RUBRIC PANEL -->
+                <div id="explanation-box" class="hidden bg-white rounded-xl border-2 border-slate-200 shadow-md overflow-hidden transition-all">
+                    <!-- Dynamic Header -->
+                    <div id="explanation-header" class="px-5 py-3 flex flex-wrap items-center justify-between gap-2 border-b">
+                        <div class="flex items-center space-x-2 font-bold text-sm sm:text-base">
+                            <i id="explanation-icon" class="fa-solid fa-circle-check"></i>
+                            <span id="explanation-status-text">Chính xác!</span>
+                        </div>
+                        <span id="explanation-correct-badge" class="text-xs font-bold px-2.5 py-1 rounded bg-white/80">
+                            Đáp án đúng: A
+                        </span>
+                    </div>
+                    
+                    <div class="p-5 space-y-4 text-sm sm:text-base leading-relaxed text-slate-700">
+                        
+                        <!-- SAQ MODEL ANSWER & SELF-ASSESSMENT RUBRIC (Only shown for SAQ) -->
+                        <div id="saq-model-answer-section" class="hidden space-y-4">
+                            <div class="bg-purple-50 border border-purple-200 rounded-xl p-4">
+                                <h4 class="font-bold text-purple-900 text-xs uppercase tracking-wider mb-1.5 flex items-center">
+                                    <i class="fa-solid fa-award text-purple-600 mr-1.5"></i>Đáp án chuẩn (Model Answer)
+                                </h4>
+                                <p id="saq-model-answer-text" class="text-purple-950 font-semibold text-sm sm:text-base"></p>
+                            </div>
+
+                            <div class="bg-slate-50 border border-slate-200 rounded-xl p-4">
+                                <h4 class="font-bold text-slate-800 text-xs uppercase tracking-wider mb-2 flex items-center">
+                                    <i class="fa-solid fa-clipboard-check text-teal-600 mr-1.5"></i>Tiêu chí chấm điểm (Rubric - Cần đạt các ý sau):
+                                </h4>
+                                <ul id="saq-rubric-list" class="space-y-1.5 text-sm text-slate-700 list-disc list-inside">
+                                    <!-- Dynamic rubric points -->
+                                </ul>
+
+                                <!-- Self-assessment confirmation buttons -->
+                                <div class="mt-4 pt-3 border-t border-slate-200 flex flex-wrap items-center justify-between gap-2">
+                                    <span class="text-xs font-bold text-slate-700">Tự đánh giá câu trả lời của bạn:</span>
+                                    <div class="flex items-center space-x-2">
+                                        <button id="btn-saq-pass" onclick="setSaqSelfGrade(true)" class="px-3.5 py-1.5 rounded-lg text-xs font-bold border transition-all-fast flex items-center">
+                                            <i class="fa-solid fa-check mr-1.5"></i>Đạt yêu cầu
+                                        </button>
+                                        <button id="btn-saq-fail" onclick="setSaqSelfGrade(false)" class="px-3.5 py-1.5 rounded-lg text-xs font-bold border transition-all-fast flex items-center">
+                                            <i class="fa-solid fa-xmark mr-1.5"></i>Chưa đạt
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Clinical Pathophysiology Explanation (For both MCQ and SAQ) -->
+                        <div>
+                            <h4 class="font-bold text-navy-900 text-xs uppercase tracking-wider mb-1.5 flex items-center">
+                                <i class="fa-solid fa-brain text-teal-600 mr-1.5"></i>Phân tích lâm sàng & Cơ chế bệnh sinh
+                            </h4>
+                            <p id="explanation-main" class="text-slate-800"></p>
+                        </div>
+
+                        <!-- MCQ Distractors Analysis (Only shown for MCQ) -->
+                        <div id="mcq-distractors-section" class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                            <h4 class="font-bold text-slate-700 text-xs uppercase tracking-wider mb-2 flex items-center">
+                                <i class="fa-solid fa-list-check text-slate-500 mr-1.5"></i>Phân tích loại trừ các phương án
+                            </h4>
+                            <ul id="explanation-distractors" class="space-y-2 text-sm text-slate-700">
+                                <!-- Dynamic option breakdown -->
+                            </ul>
+                        </div>
+
+                        <!-- Reference Footer -->
+                        <div class="pt-2 border-t border-slate-100 flex items-start space-x-2 text-xs text-slate-500">
+                            <i class="fa-solid fa-book-medical text-teal-700 mt-0.5"></i>
+                            <div>
+                                <span class="font-semibold text-slate-700">Tài liệu tham chiếu: </span>
+                                <span id="explanation-reference"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <!-- ===================================================================== -->
+    <!-- MODALS (Lab Values, Import JSON, Review Dashboard)                    -->
+    <!-- ===================================================================== -->
+
+    <!-- 1. LAB VALUES REFERENCE MODAL -->
+    <div id="lab-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[85vh] flex flex-col shadow-2xl border border-slate-200 overflow-hidden">
+            <div class="bg-navy-900 text-white px-5 py-3.5 flex items-center justify-between">
+                <h3 class="font-bold text-base flex items-center">
+                    <i class="fa-solid fa-flask-vial text-teal-400 mr-2"></i>
+                    Giá trị tham chiếu Xét nghiệm Cơ bản
+                </h3>
+                <button onclick="closeModal('lab-modal')" class="text-slate-300 hover:text-white p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <div class="p-4 border-b border-slate-200 bg-slate-50">
+                <input type="text" id="lab-search-input" onkeyup="filterLabReference()" placeholder="Tìm kiếm chỉ số (VD: Troponin, Creatinin, Kali, Tiểu cầu, pH...)" class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:border-teal-600">
+            </div>
+            <div class="p-5 overflow-y-auto space-y-5 text-sm" id="lab-reference-content">
+                <!-- Populated by JS -->
+            </div>
+            <div class="bg-slate-50 px-5 py-3 border-t border-slate-200 flex justify-end">
+                <button onclick="closeModal('lab-modal')" class="px-4 py-2 bg-navy-900 text-white text-sm font-medium rounded-lg hover:bg-navy-800">Đóng</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. IMPORT JSON MODAL (Supports both MCQ & SAQ) -->
+    <div id="import-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl border border-slate-200 overflow-hidden">
+            <div class="bg-navy-900 text-white px-5 py-3.5 flex items-center justify-between">
+                <h3 class="font-bold text-base flex items-center">
+                    <i class="fa-solid fa-file-code text-amber-400 mr-2"></i>
+                    Nhập bộ câu hỏi JSON (Hỗ trợ cả Trắc nghiệm & Tự luận ngắn)
+                </h3>
+                <button onclick="closeModal('import-modal')" class="text-slate-300 hover:text-white p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <div class="p-5 overflow-y-auto space-y-4 text-sm">
+                <p class="text-slate-600">
+                    Dán mảng dữ liệu <code class="bg-slate-100 px-1.5 py-0.5 rounded text-teal-700 font-mono">JSON</code> tạo từ AI vào bên dưới. Hệ thống hỗ trợ <code class="bg-sky-50 text-sky-700 px-1 rounded font-mono">"type": "mcq"</code> và <code class="bg-purple-50 text-purple-700 px-1 rounded font-mono">"type": "saq"</code>.
+                </p>
+                
+                <div class="flex items-center justify-between">
+                    <span class="font-semibold text-slate-700 text-xs uppercase tracking-wider">Dữ liệu JSON:</span>
+                    <button onclick="fillSampleJsonTemplate()" class="text-xs text-teal-700 hover:underline font-semibold">
+                        <i class="fa-solid fa-wand-magic-sparkles mr-1"></i>Chèn mẫu cấu trúc chuẩn (MCQ + SAQ)
+                    </button>
+                </div>
+
+                <textarea id="json-input-area" rows="10" class="w-full p-3 font-mono text-xs bg-slate-900 text-emerald-300 rounded-xl border border-slate-700 focus:outline-none focus:border-teal-500" placeholder='Dán mã JSON câu hỏi tại đây hoặc nhấn "Chèn mẫu cấu trúc chuẩn" để xem định dạng...'></textarea>
+
+                <div id="json-error-msg" class="hidden p-3 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-xs font-medium"></div>
+            </div>
+            <div class="bg-slate-50 px-5 py-3 border-t border-slate-200 flex items-center justify-between">
+                <button onclick="resetToDefaultQuestions()" class="text-xs text-slate-600 hover:text-rose-600 font-medium">
+                    <i class="fa-solid fa-rotate-left mr-1"></i>Khôi phục 8 câu mẫu mặc định
+                </button>
+                <div class="flex space-x-2">
+                    <button onclick="closeModal('import-modal')" class="px-4 py-2 border border-slate-300 bg-white text-slate-700 text-sm font-medium rounded-lg hover:bg-slate-100">Hủy</button>
+                    <button onclick="importJsonQuestions()" class="px-4 py-2 bg-teal-600 text-white text-sm font-semibold rounded-lg hover:bg-teal-700">Nạp đề luyện thi</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. REVIEW DASHBOARD MODAL (Summary & Wrong Questions Retry) -->
+    <div id="dashboard-modal" class="hidden fixed inset-0 bg-slate-900/75 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl border border-slate-200 overflow-hidden">
+            <div class="bg-navy-900 text-white px-6 py-4 flex items-center justify-between">
+                <div>
+                    <h3 class="font-bold text-lg flex items-center">
+                        <i class="fa-solid fa-chart-line text-teal-400 mr-2"></i>
+                        Tổng kết Kết quả Luyện thi
+                    </h3>
+                    <p class="text-xs text-slate-300 mt-0.5">Thống kê chi tiết theo chuyên khoa và loại câu hỏi</p>
+                </div>
+                <button onclick="closeModal('dashboard-modal')" class="text-slate-300 hover:text-white p-1">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+
+            <div class="p-6 overflow-y-auto space-y-6">
+                <!-- Overall Score Cards -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+                    <div class="bg-teal-50 border border-teal-200 rounded-xl p-3">
+                        <div class="text-[11px] font-bold text-teal-700 uppercase">Tổng đạt</div>
+                        <div id="dash-total-score" class="text-xl sm:text-2xl font-extrabold text-navy-950 mt-1">0/8</div>
+                        <div id="dash-total-percent" class="text-xs font-bold text-teal-600 mt-0.5">0%</div>
+                    </div>
+                    <div class="bg-sky-50 border border-sky-200 rounded-xl p-3">
+                        <div class="text-[11px] font-bold text-sky-700 uppercase">Trắc nghiệm</div>
+                        <div id="dash-mcq-score" class="text-xl sm:text-2xl font-extrabold text-navy-950 mt-1">0/4</div>
+                        <div class="text-[11px] text-sky-600 mt-0.5">MCQ</div>
+                    </div>
+                    <div class="bg-purple-50 border border-purple-200 rounded-xl p-3">
+                        <div class="text-[11px] font-bold text-purple-700 uppercase">Tự luận ngắn</div>
+                        <div id="dash-saq-score" class="text-xl sm:text-2xl font-extrabold text-navy-950 mt-1">0/4</div>
+                        <div class="text-[11px] text-purple-600 mt-0.5">SAQ</div>
+                    </div>
+                    <div class="bg-slate-50 border border-slate-200 rounded-xl p-3">
+                        <div class="text-[11px] font-bold text-slate-500 uppercase">Thời gian</div>
+                        <div id="dash-time-spent" class="text-xl sm:text-2xl font-extrabold text-navy-950 mt-1 font-mono">00:00</div>
+                        <div class="text-[11px] text-slate-500 mt-0.5">Luyện tập</div>
+                    </div>
+                </div>
+
+                <!-- Breakdown by Specialty -->
+                <div>
+                    <h4 class="font-bold text-xs text-navy-900 uppercase tracking-wider mb-3 flex items-center">
+                        <i class="fa-solid fa-stethoscope text-teal-600 mr-2"></i>Hiệu suất theo Chuyên khoa
+                    </h4>
+                    <div id="dash-specialty-breakdown" class="space-y-3 bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <!-- Dynamic progress bars -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-slate-50 px-6 py-4 border-t border-slate-200 flex flex-wrap items-center justify-between gap-2">
+                <button onclick="resetAllProgress()" class="px-3.5 py-2 rounded-lg border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 font-semibold text-xs sm:text-sm flex items-center">
+                    <i class="fa-solid fa-rotate-right mr-1.5"></i>Làm mới toàn bộ
+                </button>
+                <div class="flex flex-wrap gap-2">
+                    <button id="btn-retry-wrong" onclick="practiceWrongQuestions()" class="px-4 py-2 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-semibold text-xs sm:text-sm shadow flex items-center">
+                        <i class="fa-solid fa-fire-flame-curved mr-1.5"></i>Luyện lại các câu chưa đạt
+                    </button>
+                    <button onclick="closeModal('dashboard-modal')" class="px-4 py-2 rounded-lg bg-navy-900 hover:bg-navy-800 text-white font-semibold text-xs sm:text-sm">
+                        Tiếp tục luyện
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast-notification" class="fixed bottom-6 right-5 bg-navy-900 text-white px-4 py-2.5 rounded-xl shadow-lg border border-slate-700 text-xs sm:text-sm font-medium flex items-center space-x-2 transform translate-y-20 opacity-0 transition-all duration-300 z-50 pointer-events-none">
+        <i id="toast-icon" class="fa-solid fa-circle-info text-teal-400"></i>
+        <span id="toast-message">Thông báo</span>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- JAVASCRIPT APPLICATION LOGIC                                          -->
+    <!-- ===================================================================== -->
+    <script>
+        // =========================================================================
+        // 1. NGÂN HÀNG CÂU HỎI MẪU (KẾT HỢP 4 CÂU MCQ & 4 CÂU TỰ LUẬN NGẮN SAQ)
+        // =========================================================================
+        const DEFAULT_QUESTIONS = [
+            // --- CÂU 1: NỘI KHOA (MCQ) ---
+            {
+                id: "NOI-01",
+                type: "mcq",
+                specialty: "Nội khoa",
+                topic: "Tim mạch - Hội chứng vành cấp",
+                vignette: "Bệnh nhân nam 58 tuổi nhập khoa Cấp cứu vì đau thắt ngực trái dữ dội khởi phát cách nhập viện 45 phút khi đang nghỉ ngơi, đau lan lên vai trái và hàm dưới, kèm vã mồ hôi lạnh và khó thở. Tiền sử tăng huyết áp 10 năm điều trị không đều, hút thuốc lá 30 gói-năm. Khám lâm sàng: bệnh nhân tỉnh, vật vã, da tái lạnh; mạch 104 lần/phút, huyết áp 145/90 mmHg, nhịp thở 22 lần/phút, SpO2 94% (khí trời). Nghe tim đều, không âm thổi; phổi ran ẩm rải rác hai đáy. Điện tâm đồ (ECG) 12 chuyển đạo đo ngay tại giường cho thấy ST chênh lên dạng vòm 4 mm ở các chuyển đạo V1, V2, V3, V4 và ST chênh xuống soi gương ở DII, DIII, aVF.",
+                labs: [
+                    { name: "Troponin T siêu nhạy (hs-cTnT)", value: "185 ng/L (Tăng)", ref: "< 14 ng/L", abnormal: "high" },
+                    { name: "Creatinin huyết thanh", value: "98 µmol/L", ref: "62 - 106 µmol/L", abnormal: "normal" },
+                    { name: "Kali máu", value: "4.1 mmol/L", ref: "3.5 - 5.0 mmol/L", abnormal: "normal" },
+                    { name: "Đường huyết mao mạch", value: "8.2 mmol/L", ref: "3.9 - 7.8 mmol/L", abnormal: "high" }
+                ],
+                hint: "Bệnh nhân có ST chênh lên ở V1-V4 (STEMI thành trước rộng) đến trong giờ đầu tại bệnh viện có sẵn trung tâm thông tim can thiệp (thời gian chuyển can thiệp 45 phút < 90 phút).",
+                question: "Bệnh viện hiện có trung tâm thông tim can thiệp hoạt động 24/7 (thời gian từ lúc nhập viện đến khi đưa dây dẫn qua tổn thương ước tính 45 phút). Phác đồ xử trí tái tưới máu và chống huyết khối ban đầu nào sau đây là phù hợp nhất?",
+                options: {
+                    "A": "Tiêu sợi huyết đường tĩnh mạch bằng Alteplase ngay lập tức, sau đó chuyển chụp mạch vành sau 24 giờ",
+                    "B": "Nạp Aspirin 300 mg + Ticagrelor 180 mg, dùng Heparin không phân đoạn và chuyển can thiệp mạch vành qua da thì đầu (Primary PCI) ngay",
+                    "C": "Truyền tĩnh mạch Nitroglycerin liều cao kết hợp Morphine giảm đau, theo dõi Troponin T lặp lại sau 3 giờ trước khi quyết định can thiệp",
+                    "D": "Dùng Clopidogrel 75 mg + Aspirin 81 mg đường uống, Enoxaparin tiêm dưới da và lên lịch chụp mạch vành chương trình vào sáng hôm sau"
+                },
+                correct_answer: "B",
+                explanation: "Bệnh nhân có bệnh cảnh điển hình của Nhồi máu cơ tim cấp có ST chênh lên (STEMI) thành trước rộng (ST chênh lên V1-V4) đến sớm trong giờ đầu. Tại cơ sở y tế có khả năng can thiệp mạch vành qua da (PCI) với thời gian từ lúc tiếp xúc y tế đến khi mở thông mạch (FMC-to-device) < 90 phút (ở đây là 45 phút), Can thiệp mạch vành qua da thì đầu (Primary PCI) là lựa chọn ưu tiên hàng đầu, vượt trội hơn tiêu sợi huyết. Bệnh nhân cần được nạp ngay kháng kết tập tiểu cầu kép (Aspirin liều nạp 150-300 mg + chất ức chế P2Y12 mạnh như Ticagrelor 180 mg) và thuốc chống đông (Heparin không phân đoạn).",
+                option_analysis: {
+                    "A": "Sai. Tiêu sợi huyết chỉ được chỉ định khi không thể thực hiện Primary PCI trong vòng 120 phút kể từ lúc chẩn đoán STEMI.",
+                    "B": "Đúng. Tuân thủ đúng phác đồ tái tưới máu sớm bằng Primary PCI kết hợp kháng tiểu cầu kép liều nạp và chống đông.",
+                    "C": "Sai. Chẩn đoán STEMI dựa vào lâm sàng và ECG; tuyệt đối không trì hoãn tái tưới máu để chờ kết quả men tim lần 2 vì 'thời gian là cơ tim'.",
+                    "D": "Sai. Liều Clopidogrel 75 mg và Aspirin 81 mg là liều duy trì (không đủ đạt hiệu quả ức chế tiểu cầu nhanh trong cấp cứu), và STEMI không được trì hoãn đến ngày hôm sau."
+                },
+                reference: "Khuyến cáo của Hội Tim mạch học Việt Nam (VNHA) & ESC 2023 về chẩn đoán và xử trí Hội chứng mạch vành cấp."
+            },
+
+            // --- CÂU 2: NỘI KHOA (TỰ LUẬN NGẮN - SAQ) ---
+            {
+                id: "NOI-02",
+                type: "saq",
+                specialty: "Nội khoa",
+                topic: "Nội tiết - Cấp cứu chuyển hóa",
+                vignette: "Bệnh nhân nữ 22 tuổi, tiền sử đái tháo đường type 1 phát hiện năm 14 tuổi, được người nhà đưa vào viện vì nôn ói nhiều, đau bụng âm ỉ lan tỏa và thở nhanh sâu từ 12 giờ nay. Hai ngày trước bệnh nhân bị viêm họng sốt nhẹ nên tự ý ngưng tiêm Insulin vì ăn uống kém. Khám: lơ mơ nhưng gọi mở mắt, môi khô, lưỡi bẩn, mắt trũng; mạch 122 lần/phút, huyết áp 95/60 mmHg, nhịp thở 28 lần/phút kiểu Kussmaul, hơi thở có mùi trái cây chín (aceton), nhiệt độ 37.6°C.",
+                labs: [
+                    { name: "Glucose huyết tương", value: "26.4 mmol/L (Tăng cao)", ref: "3.9 - 5.5 mmol/L", abnormal: "high" },
+                    { name: "pH máu động mạch", value: "7.14 (Giảm nặng)", ref: "7.35 - 7.45", abnormal: "low" },
+                    { name: "HCO3- (Bicarbonat)", value: "9.5 mmol/L (Giảm nặng)", ref: "22 - 26 mmol/L", abnormal: "low" },
+                    { name: "Natri / Kali máu", value: "131 / 3.1 mmol/L (Giảm)", ref: "Na: 135-145 | K: 3.5-5.0", abnormal: "low" },
+                    { name: "Ceton niệu / Ceton máu", value: "Dương tính mạnh (+++)", ref: "Âm tính", abnormal: "high" }
+                ],
+                hint: "Chú ý chỉ số Kali máu đang là 3.1 mmol/L (< 3.3 mmol/L). Điều gì sẽ xảy ra nếu truyền Insulin tĩnh mạch ngay lập tức trước khi bù Kali?",
+                question: "1) Nêu chẩn đoán xác định đầy đủ của bệnh nhân.\n2) Sau khi lập đường truyền tĩnh mạch, hai ưu tiên điều trị đầu tiên ngay lúc này là gì và tại sao chưa được truyền Insulin ngay?",
+                model_answer: "1) Chẩn đoán: Toan ceton đái tháo đường (DKA) mức độ trung bình - nặng (trên nền ĐTĐ type 1) kèm hạ Kali máu.\n2) Xử trí ưu tiên: Bù dịch đẳng trương (NaCl 0.9%) và bù Kali clorua đường tĩnh mạch trước; trì hoãn Insulin cho đến khi Kali máu ≥ 3.3 mmol/L vì Insulin đẩy Kali vào nội bào sẽ gây hạ Kali máu nặng đe dọa ngừng tim.",
+                keywords: ["toan ceton", "dka", "bù dịch", "nacl 0.9%", "kali", "3.3"],
+                rubric: [
+                    "Nêu đúng chẩn đoán: Toan ceton đái tháo đường (DKA).",
+                    "Nêu được ưu tiên số 1: Truyền dịch đẳng trương (NaCl 0.9%).",
+                    "Nêu được việc bù Kali tĩnh mạch và trì hoãn Insulin cho tới khi Kali máu ≥ 3.3 mmol/L (tránh loạn nhịp/ngừng tim do hạ Kali máu nặng)."
+                ],
+                explanation: "Trong cấp cứu Toan ceton đái tháo đường (DKA), nguyên tắc bất di bất dịch là: (1) Bù dịch NaCl 0.9% đầu tiên để khôi phục tưới máu mô và giảm đường huyết nhờ pha loãng; (2) Kiểm tra Kali máu TRƯỚC khi khởi động Insulin. Vì Insulin kích hoạt bơm Na+/K+-ATPase đẩy Kali từ ngoại bào vào trong tế bào, nếu truyền Insulin khi K+ < 3.3 mmol/L (bệnh nhân này là 3.1 mmol/L), nồng độ Kali máu sẽ tụt giảm đột ngột gây loạn nhịp thất ác tính và ngừng tim.",
+                reference: "Hướng dẫn chẩn đoán và điều trị Đái tháo đường típ 1 - Bộ Y tế & ADA Standards of Care."
+            },
+
+            // --- CÂU 3: NGOẠI KHOA (MCQ) ---
+            {
+                id: "NGOAI-01",
+                type: "mcq",
+                specialty: "Ngoại khoa",
+                topic: "Cấp cứu Ngoại tiêu hóa",
+                vignette: "Bệnh nhân nữ 65 tuổi nhập viện vì đau bụng từng cơn dữ dội quanh rốn kèm nôn ra dịch xanh vàng nhiều lần từ 14 giờ nay, bí trung đại tiện hoàn toàn. Tiền sử mổ cắt tử cung toàn phần qua đường trắng giữa dưới rốn cách đây 5 năm. Khám lâm sàng: bệnh nhân mệt, môi khô, mạch 110 lần/phút, huyết áp 105/65 mmHg, nhiệt độ 38.4°C. Bụng chướng căng vùng giữa bụng, có sẹo mổ cũ đường trắng giữa dưới rốn lành tốt. Khi sờ nắn thấy có phản ứng thành bụng lan tỏa và cảm ứng phúc mạc (+), gõ vang vùng rốn, nghe nhu động ruột lúc đầu tăng âm sắc sau giảm dần.",
+                labs: [
+                    { name: "Bạch cầu (WBC)", value: "18.6 G/L (Tăng cao)", ref: "4.0 - 10.0 G/L", abnormal: "high" },
+                    { name: "Lactate máu động mạch", value: "4.3 mmol/L (Tăng cao)", ref: "0.5 - 2.2 mmol/L", abnormal: "high" },
+                    { name: "Natri / Kali máu", value: "132 / 3.3 mmol/L (Giảm)", ref: "Na: 135-145 | K: 3.5-5.0", abnormal: "low" },
+                    { name: "X-quang bụng đứng", value: "Nhiều mức nước - hơi tập trung vùng giữa bụng, chân rộng vòm thấp, xếp hình bậc thang", ref: "Không có mức nước hơi bất thường", abnormal: "high" }
+                ],
+                hint: "Bệnh nhân có hội chứng tắc ruột non sau mổ nhưng đã xuất hiện sốt cao 38.4°C, phản ứng thành bụng và Lactate máu tăng cao 4.3 mmol/L.",
+                question: "Chẩn đoán lâm sàng phù hợp nhất và thái độ xử trí đúng đắn cho bệnh nhân này là gì?",
+                options: {
+                    "A": "Tắc ruột non cơ học đơn thuần do dính — Đặt sonde dạ dày hút giải áp, bù dịch điện giải và điều trị bảo tồn trong 48 giờ",
+                    "B": "Tắc ruột non cơ học nghi ngờ có biến chứng nghẹt/hoại tử ruột — Hồi sức tích cực ngắn giờ và phẫu thuật cấp cứu khẩn trương",
+                    "C": "Liệt ruột cơ năng sau rối loạn điện giải — Bù Kali tĩnh mạch và dùng thuốc kích thích nhu động ruột Neostigmine",
+                    "D": "Tắc đại tràng sigma do u — Nội soi đại tràng cấp cứu đặt stent giải áp"
+                },
+                correct_answer: "B",
+                explanation: "Bệnh nhân có hội chứng tắc ruột cơ học điển hình (đau cơn, nôn sớm dịch mật, bí trung đại tiện, chướng bụng, X-quang có mức nước hơi ruột non chân rộng vòm thấp) trên nền có sẹo mổ cũ vùng bụng (nguyên nhân hàng đầu là dính ruột sau mổ). Tuy nhiên, bệnh nhân đã xuất hiện các dấu hiệu báo động của tắc ruột thắt nghẹt / thiếu máu hoại tử ruột: sốt cao 38.4°C, mạch nhanh 110 lần/phút, có phản ứng thành bụng và cảm ứng phúc mạc (+), bạch cầu tăng cao 18.6 G/L và đặc biệt là Lactate máu tăng cao (4.3 mmol/L). Khi có dấu hiệu nghi ngờ nghẹt ruột, tuyệt đối không điều trị bảo tồn mà phải hồi sức tích cực nhanh và mổ cấp cứu ngay.",
+                option_analysis: {
+                    "A": "Sai. Điều trị bảo tồn bằng sonde dạ dày chỉ áp dụng cho tắc ruột do dính đơn thuần KHÔNG có dấu hiệu kích thích phúc mạc hay thiếu máu ruột.",
+                    "B": "Đúng. Sốt, phản ứng thành bụng, bạch cầu tăng và Lactate máu tăng là chỉ điểm của nghẹt ruột/hoại tử ruột cần phẫu thuật cấp cứu.",
+                    "C": "Sai. Liệt ruột cơ năng không gây đau bụng từng cơn dữ dội và X-quang thường giãn toàn bộ cả ruột non lẫn đại tràng.",
+                    "D": "Sai. Hình ảnh mức nước hơi chân rộng vòm thấp ở giữa bụng đặc trưng cho tắc ruột non, không phải tắc đại tràng."
+                },
+                reference: "Bệnh học Ngoại khoa Tiêu hóa - Đại học Y Dược Huế / ĐH Y Hà Nội & Hướng dẫn WSES về tắc ruột non do dính."
+            },
+
+            // --- CÂU 4: NGOẠI KHOA (TỰ LUẬN NGẮN - SAQ) ---
+            {
+                id: "NGOAI-02",
+                type: "saq",
+                specialty: "Ngoại khoa",
+                topic: "Cấp cứu Ngoại khoa - Thủng tạng rỗng",
+                vignette: "Bệnh nhân nam 46 tuổi nhập khoa Cấp cứu vì đau bụng thượng vị dữ dội như dao đâm khởi phát đột ngột cách nhập viện 3 giờ khi đang làm việc, sau đó đau lan nhanh khắp bụng. Tiền sử đau thượng vị âm ỉ nhiều năm, tự mua thuốc giảm đau khớp uống thường xuyên trong 2 tuần nay. Khám lâm sàng: bệnh nhân nằm im không dám cử động, vẻ mặt hốt hoảng, vã mồ hôi; mạch 108 lần/phút, huyết áp 110/70 mmHg, nhiệt độ 37.8°C. Bụng không chướng nhiều, co cứng toàn bộ thành bụng như gỗ (cảm ứng phúc mạc lan tỏa), gõ mất vùng đục trước gan.",
+                labs: [
+                    { name: "Bạch cầu (WBC)", value: "16.4 G/L (Tăng)", ref: "4.0 - 10.0 G/L", abnormal: "high" },
+                    { name: "Amylase huyết thanh", value: "95 U/L", ref: "< 100 U/L", abnormal: "normal" },
+                    { name: "Lactate máu", value: "2.6 mmol/L (Tăng nhẹ)", ref: "0.5 - 2.2 mmol/L", abnormal: "high" }
+                ],
+                hint: "Đau thượng vị đột ngột như dao đâm + bụng co cứng như gỗ + mất vùng đục trước gan ở bệnh nhân dùng NSAIDs.",
+                question: "1) Nêu chẩn đoán sơ bộ phù hợp nhất.\n2) Chỉ định cận lâm sàng hình ảnh học đầu tay nhanh nhất tại khoa Cấp cứu để xác định chẩn đoán và dấu hiệu điển hình cần tìm là gì?",
+                model_answer: "1) Chẩn đoán sơ bộ: Viêm phúc mạc toàn thể do thủng ổ loét dạ dày - tá tràng.\n2) Cận lâm sàng đầu tay: Chụp X-quang bụng đứng không sửa soạn (hoặc X-quang ngực thẳng tư thế đứng) để tìm dấu hiệu liềm hơi dưới cơ hoành (hoặc chụp CT bụng nếu X-quang âm tính mà lâm sàng nghi ngờ cao).",
+                keywords: ["thủng", "dạ dày", "tá tràng", "viêm phúc mạc", "x-quang", "liềm hơi"],
+                rubric: [
+                    "Chẩn đoán đúng: Thủng ổ loét dạ dày - tá tràng (hoặc thủng tạng rỗng) gây viêm phúc mạc.",
+                    "Chỉ định hình ảnh học đầu tay: X-quang bụng đứng không sửa soạn (hoặc X-quang ngực đứng / CT-scan bụng).",
+                    "Mô tả đúng dấu hiệu đặc trưng: Liềm hơi dưới cơ hoành (hoặc khí tự do trong ổ phúc mạc)."
+                ],
+                explanation: "Tam chứng kinh điển của thủng ổ loét dạ dày - tá tràng gồm: (1) Tiền sử loét dạ dày tá tràng hoặc dùng thuốc NSAIDs/Corticoid; (2) Đau bụng thượng vị đột ngột dữ dội như dao đâm; (3) Khám bụng co cứng như gỗ và gõ mất vùng đục trước gan. X-quang bụng đứng (hoặc ngực đứng) là phương tiện chẩn đoán hình ảnh nhanh, rẻ tiền và phổ biến nhất giúp phát hiện liềm hơi dưới vòm hoành ở khoảng 75-80% trường hợp trước khi chuyển mổ cấp cứu khâu lỗ thủng.",
+                reference: "Triệu chứng học & Bệnh học Ngoại khoa - Đại học Y Hà Nội / Đại học Y Dược Huế."
+            },
+
+            // --- CÂU 5: SẢN PHỤ KHOA (MCQ) ---
+            {
+                id: "SAN-01",
+                type: "mcq",
+                specialty: "Sản phụ khoa",
+                topic: "Sản bệnh lý - Tăng huyết áp thai kỳ",
+                vignette: "Sản phụ 31 tuổi, con so, thai 35 tuần 2 ngày, nhập viện vì đau đầu vùng chẩm dữ dội, nhìn mờ và đau tức vùng thượng vị từ 4 giờ nay. Quá trình khám thai trước đó ghi nhận huyết áp bình thường đến tuần 32. Khám lúc nhập viện: tỉnh táo, phù toàn thân rõ; huyết áp đo 2 lần cách nhau 15 phút đều là 168/112 mmHg, mạch 92 lần/phút, phản xạ gân xương tứ chi tăng nhạy. Khám sản khoa: bề cao tử cung 29 cm, tim thai 148 lần/phút, cơn co tử cung thưa nhẹ, cổ tử cung đóng kín.",
+                labs: [
+                    { name: "Tiểu cầu (PLT)", value: "82 G/L (Giảm)", ref: "150 - 400 G/L", abnormal: "low" },
+                    { name: "AST / ALT", value: "145 / 162 U/L (Tăng > 2 lần)", ref: "< 35 U/L", abnormal: "high" },
+                    { name: "Creatinin huyết thanh", value: "118 µmol/L (Tăng)", ref: "45 - 80 µmol/L (thai kỳ)", abnormal: "high" },
+                    { name: "Protein niệu 10 thông số", value: "3+ (3.0 g/L)", ref: "Âm tính", abnormal: "high" }
+                ],
+                hint: "Thai 35 tuần 2 ngày (> 34 tuần), huyết áp ≥ 160/110 mmHg kèm đau đầu, nhìn mờ, đau thượng vị, tiểu cầu < 100 G/L và men gan tăng > 2 lần.",
+                question: "Chẩn đoán chính xác và phác đồ xử trí ưu tiên ngay lúc này đối với sản phụ là gì?",
+                options: {
+                    "A": "Tiền sản giật có dấu hiệu nặng biến chứng hội chứng HELLP — Dùng Magnesium sulfate (MgSO4) ngừa co giật, hạ áp bằng Nicardipine/Labetalol tĩnh mạch và chấm dứt thai kỳ",
+                    "B": "Tiền sản giật nhẹ — Cho uống Methyldopa 250 mg x 2 lần/ngày, tiêm trưởng thành phổi Betamethasone và dưỡng thai đến đủ 37 tuần",
+                    "C": "Tăng huyết áp mạn tính ghép tiền sản giật — Truyền dịch tốc độ nhanh 150 mL/giờ để cải thiện tưới máu thận và theo dõi ngoại trú",
+                    "D": "Sản giật — Tiêm tĩnh mạch Diazepam 10 mg ngay lập tức và mổ lấy thai tối khẩn dưới gây mê nội khí quản"
+                },
+                correct_answer: "A",
+                explanation: "Sản phụ có thai > 20 tuần xuất hiện tăng huyết áp nặng (≥ 160/110 mmHg), protein niệu 3+, kèm các triệu chứng thần kinh (đau đầu dữ dội, nhìn mờ, tăng phản xạ gân xương) và đau thượng vị. Cận lâm sàng cho thấy giảm tiểu cầu (< 100 G/L) và tăng men gan AST/ALT (> 2 lần giới hạn trên) gợi ý biến chứng hội chứng HELLP. Đây là Tiền sản giật có dấu hiệu nặng ở tuổi thai ≥ 34 tuần. Phác đồ chuẩn là: (1) Dự phòng cơn giật bằng Magnesium sulfate (liều tấn công 4-6g IV sau đó duy trì 1-2g/giờ); (2) Kiểm soát huyết áp khẩn cấp (Labetalol IV, Nicardipine IV hoặc Nifedipine uống); (3) Chấm dứt thai kỳ vì thai đã ≥ 34 tuần và mẹ có biến chứng nặng.",
+                option_analysis: {
+                    "A": "Đúng. Đảm bảo đồng thời 3 mục tiêu sống còn: ngừa sản giật bằng MgSO4, hạ áp an toàn và chấm dứt thai kỳ khi có dấu hiệu nặng ở thai ≥ 34 tuần.",
+                    "B": "Sai. Không được điều trị ngoại trú hay dưỡng thai kéo dài đến 37 tuần khi đã có dấu hiệu nặng và hội chứng HELLP vì nguy cơ tử vong mẹ và thai rất cao.",
+                    "C": "Sai. Tuyệt đối hạn chế truyền dịch quá mức ở bệnh nhân tiền sản giật nặng vì dễ gây phù phổi cấp.",
+                    "D": "Sai. Bệnh nhân chưa xuất hiện cơn co giật toàn thân nên chưa chẩn đoán Sản giật, và MgSO4 luôn là thuốc đầu tay ưu tiên hơn Diazepam."
+                },
+                reference: "Hướng dẫn Quốc gia về các dịch vụ Chăm sóc sức khỏe sinh sản (Bộ Y tế) & ACOG Practice Bulletin."
+            },
+
+            // --- CÂU 6: SẢN PHỤ KHOA (TỰ LUẬN NGẮN - SAQ) ---
+            {
+                id: "SAN-02",
+                type: "saq",
+                specialty: "Sản phụ khoa",
+                topic: "Cấp cứu Sản khoa - Băng huyết sau sinh",
+                vignette: "Sản phụ 29 tuổi, PARA 2002, vừa sinh thường một bé trai cân nặng 3.900g sau cuộc chuyển dạ kéo dài 14 giờ có tăng co bằng Oxytocin. Sau sổ nhau trọn vẹn 15 phút, nữ hộ sinh báo sản phụ ra máu âm đạo đỏ tươi ồ ạt, ước tính khoảng 800 mL. Khám ngay tại giường: sản phụ da xanh, vã mồ hôi, mạch nhanh 118 lần/phút, huyết áp tụt còn 85/50 mmHg. Khám bụng thấy đáy tử cung cao trên rốn 2 khoát ngón tay, mật độ tử cung mềm nhão, ấn vào thấy máu cục và máu loãng trào ra nhiều từ âm đạo.",
+                labs: [
+                    { name: "Hemoglobin (Hb) trước sinh", value: "118 g/L", ref: "110 - 150 g/L (thai kỳ)", abnormal: "normal" },
+                    { name: "Tiểu cầu (PLT) trước sinh", value: "215 G/L", ref: "150 - 400 G/L", abnormal: "normal" },
+                    { name: "Nhóm máu", value: "O, Rh (+)", ref: "-", abnormal: "normal" }
+                ],
+                hint: "Tử cung mềm nhão, đáy tử cung cao trên rốn sau sổ nhau trọn vẹn ở sản phụ sinh con to (3.900g) và chuyển dạ kéo dài.",
+                question: "1) Nguyên nhân hàng đầu gây băng huyết sau sinh ở sản phụ này là gì?\n2) Nêu 3 bước xử trí cơ học và dùng thuốc đầu tay cần thực hiện đồng thời ngay lập tức.",
+                model_answer: "1) Nguyên nhân: Đờ tử cung sau sinh (Uterine atony).\n2) Xử trí ngay lập tức: (a) Xoa đáy tử cung tích cực qua thành bụng (kết hợp chèn ép tử cung bằng hai tay nếu cần); (b) Hồi sức chống sốc: lập 2 đường truyền tĩnh mạch lớn truyền nhanh dịch tinh thể (NaCl 0.9% hoặc Ringer Lactate), thở oxy, thông tiểu làm rỗng bàng quang; (c) Dùng thuốc tăng co tử cung đầu tay: Oxytocin truyền tĩnh mạch (10-40 IU pha trong 500-1000 mL dịch) kết hợp tiêm bắp Ergometrine (nếu không tăng huyết áp) hoặc Misoprostol / Carbetocin.",
+                keywords: ["đờ tử cung", "xoa đáy tử cung", "oxytocin", "truyền dịch", "bàng quang"],
+                rubric: [
+                    "Xác định đúng nguyên nhân: Đờ tử cung sau sinh.",
+                    "Biện pháp cơ học: Xoa đáy tử cung tích cực (và làm rỗng bàng quang).",
+                    "Hồi sức & Thuốc tăng co: Lập 2 đường truyền tĩnh mạch bù dịch nhanh + dùng Oxytocin (và/hoặc thuốc tăng co hàng 2 như Ergometrine, Misoprostol)."
+                ],
+                explanation: "Đờ tử cung chiếm khoảng 70-80% nguyên nhân băng huyết sau sinh (4T: Tone - Đờ tử cung, Trauma - Chấn thương đường sinh dục, Tissue - Sót nhau, Thrombin - Rối loạn đông máu). Các yếu tố nguy cơ rõ rệt ở ca này là chuyển dạ kéo dài, tăng co Oxytocin và thai to (3.900g). Khám thấy tử cung mềm nhão, đáy cao trên rốn khẳng định đờ tử cung. Xử trí đòi hỏi huy động cấp cứu (Báo động đỏ sản khoa), vừa hồi sức tuần hoàn, vừa xoa đáy tử cung và dùng thuốc gò tử cung ngay.",
+                reference: "Hướng dẫn Quốc gia về các dịch vụ Chăm sóc sức khỏe sinh sản (Bộ Y tế) & Phác đồ Băng huyết sau sinh Bệnh viện Từ Dũ."
+            },
+
+            // --- CÂU 7: NHI KHOA (MCQ) ---
+            {
+                id: "NHI-01",
+                type: "mcq",
+                specialty: "Nhi khoa",
+                topic: "Hô hấp Nhi",
+                vignette: "Bé trai 5 tháng tuổi được mẹ đưa đến phòng khám Nhi vì ho, khò khè và bú kém. Bệnh khởi phát cách đây 3 ngày với triệu chứng chảy nước mũi trong, hắt hơi và sốt nhẹ 37.9°C. Từ sáng nay bé thở nhanh, khò khè rõ và bỏ bú 2 cữ. Tiền sử sinh đủ tháng, cân nặng hiện tại 7.2 kg, chưa từng bị khò khè trước đây, gia đình có anh trai 4 tuổi đang bị cảm lạnh. Khám lâm sàng: bé tỉnh, quấy khóc, môi hơi tái khi khóc; nhịp thở 62 lần/phút, co lõm lồng ngực rõ, phập phồng cánh mũi, SpO2 89% (khí trời), nhịp tim 156 lần/phút, nhiệt độ 37.8°C. Nghe phổi thông khí giảm hai đáy, có nhiều ran rít, ran ngáy và ran ẩm nhỏ hạt lan tỏa hai phế trường.",
+                labs: [
+                    { name: "X-quang ngực thẳng", value: "Ứ khí hai phế trường, vòm hoành hạ thấp, dày thành phế quản quanh rốn phổi, không đông đặc nhu mô", ref: "Phổi sáng đều", abnormal: "high" },
+                    { name: "Test nhanh dịch tỵ hầu", value: "Dương tính với Virus hợp bào hô hấp (RSV)", ref: "Âm tính", abnormal: "high" },
+                    { name: "Bạch cầu máu", value: "10.5 G/L (Lympho ưu thế 68%)", ref: "6.0 - 17.5 G/L", abnormal: "normal" }
+                ],
+                hint: "Trẻ 5 tháng tuổi khò khè lần đầu sau viêm long hô hấp trên, test nhanh RSV dương tính, X-quang ứ khí không đông đặc.",
+                question: "Chẩn đoán lâm sàng và can thiệp điều trị nào sau đây có bằng chứng y học vững chắc nhất cho bệnh nhi này?",
+                options: {
+                    "A": "Viêm tiểu phế quản cấp mức độ nặng — Nhập viện, thở oxy qua cannula mũi giữ SpO2 ≥ 92%, hút thông thoáng mũi họng và đảm bảo dịch/dinh dưỡng",
+                    "B": "Cơn hen phế quản cấp ở trẻ nhũ nhi — Khí dung Salbutamol liên tục 3 lần kết hợp Prednisolone uống 2 mg/kg/ngày",
+                    "C": "Viêm phổi cộng đồng nặng — Tiêm tĩnh mạch Ceftriaxone 80 mg/kg/ngày kết hợp Azithromycin đường uống",
+                    "D": "Viêm thanh khí phế quản cấp (Croup) — Khí dung Adrenaline (Epinephrine) và tiêm bắp Dexamethasone 0.6 mg/kg"
+                },
+                correct_answer: "A",
+                explanation: "Trẻ < 2 tuổi (đặc biệt đỉnh điểm 2-6 tháng) khởi phát bằng triệu chứng viêm long hô hấp trên (sổ mũi, sốt nhẹ), sau đó xuất hiện hội chứng tắc nghẽn đường hô hấp dưới (thở nhanh 62 lần/phút, rút lõm lồng ngực, khò khè, ran rít/ngáy, X-quang ứ khí) lần đầu tiên do RSV là bệnh cảnh kinh điển của Viêm tiểu phế quản cấp (Acute Bronchiolitis). Vì trẻ có SpO2 89% (< 90-92%), thở nhanh > 60 lần/phút, rút lõm lồng ngực và bú kém nên có chỉ định nhập viện. Điều trị chủ yếu là nâng đỡ: thở oxy làm ẩm, hút sạch dịch mũi họng và bù dịch/chia nhỏ cữ bú.",
+                option_analysis: {
+                    "A": "Đúng. Oxy liệu pháp (khi SpO2 < 90-92%), làm thông thoáng đường thở và đảm bảo cân bằng nước - dinh dưỡng là nền tảng điều trị viêm tiểu phế quản cấp.",
+                    "B": "Sai. Theo khuyến cáo của AAP và Bộ Y tế, thuốc giãn phế quản (Salbutamol) và Corticoid toàn thân KHÔNG được khuyến cáo sử dụng thường quy trong viêm tiểu phế quản cấp vì không cải thiện diễn tiến bệnh.",
+                    "C": "Sai. Căn nguyên là virus (RSV), bạch cầu bình thường, X-quang không có hình ảnh đông đặc nên không chỉ định kháng sinh.",
+                    "D": "Sai. Croup đặc trưng bởi ho ông ổng, khàn tiếng và thở rít thì hít vào (tắc nghẽn hô hấp trên), không phải khò khè thì thở ra và ran rít lan tỏa."
+                },
+                reference: "Nelson Textbook of Pediatrics (21st Ed) & Phác đồ điều trị Nhi khoa - Bệnh viện Nhi Đồng 1 / Bộ Y tế."
+            },
+
+            // --- CÂU 8: NHI KHOA (TỰ LUẬN NGẮN - SAQ) ---
+            {
+                id: "NHI-02",
+                type: "saq",
+                specialty: "Nhi khoa",
+                topic: "Truyền nhiễm Nhi - Sốt xuất huyết Dengue",
+                vignette: "Bé gái 9 tuổi, cân nặng 30 kg, được đưa đến khoa Cấp cứu vì sốt cao liên tục 4 ngày nay (39 - 40°C). Từ sáng ngày thứ 5, bé hết sốt nhưng mệt lả, nôn ói 4 lần trong vòng 3 giờ và than đau tức vùng hạ sườn phải. Khám lâm sàng: bé tỉnh nhưng li bì, tay chân ấm; mạch 115 lần/phút rõ, huyết áp 100/70 mmHg, thời gian phục hồi màu da (CRT) < 2 giây. Da sung huyết, có nhiều chấm xuất huyết rải rác ở cẳng tay và cẳng chân; gan to dưới bờ sườn phải 3 cm, ấn đau tức. Xét nghiệm nhanh kháng nguyên Dengue NS1 ngày thứ 2 dương tính.",
+                labs: [
+                    { name: "Hematocrit (Hct)", value: "47% (Tăng > 20% so với nền 38%)", ref: "36 - 40%", abnormal: "high" },
+                    { name: "Tiểu cầu (PLT)", value: "38 G/L (Giảm nặng)", ref: "150 - 450 G/L", abnormal: "low" },
+                    { name: "Bạch cầu (WBC)", value: "2.9 G/L (Giảm)", ref: "4.5 - 13.5 G/L", abnormal: "low" },
+                    { name: "AST / ALT", value: "210 / 165 U/L (Tăng)", ref: "< 40 U/L", abnormal: "high" }
+                ],
+                hint: "Ngày thứ 5 hết sốt nhưng li bì, nôn nhiều, đau vùng gan, gan to > 2cm, Hct tăng 47%, tiểu cầu giảm 38 G/L, nhưng huyết động còn ổn định (HA 100/70 mmHg).",
+                question: "1) Nêu phân độ chẩn đoán chính xác theo phác đồ Bộ Y tế.\n2) Chỉ định loại dịch truyền và tốc độ truyền khởi đầu (tính cả mL/kg/giờ và mL/giờ cho bé nặng 30 kg) trong 1 - 2 giờ đầu.",
+                model_answer: "1) Phân độ: Sốt xuất huyết Dengue có dấu hiệu cảnh báo.\n2) Phác đồ truyền dịch khởi đầu: Truyền tĩnh mạch dung dịch Ringer Lactate hoặc NaCl 0.9% với tốc độ 6 - 7 mL/kg/giờ (tương đương 180 - 210 mL/giờ cho bé 30 kg) trong 1 - 2 giờ đầu, sau đó đánh giá lại lâm sàng và Hct để giảm dần tốc độ.",
+                keywords: ["dấu hiệu cảnh báo", "ringer lactate", "nacl 0.9%", "6", "7", "180", "210"],
+                rubric: [
+                    "Phân độ chính xác: Sốt xuất huyết Dengue có dấu hiệu cảnh báo (chưa vào sốc).",
+                    "Chọn đúng dịch truyền đẳng trương: Ringer Lactate hoặc NaCl 0.9%.",
+                    "Tính đúng tốc độ truyền khởi đầu: 6 - 7 mL/kg/giờ (tức 180 - 210 mL/giờ cho cân nặng 30 kg) trong 1 - 2 giờ đầu."
+                ],
+                explanation: "Bệnh nhi đang ở ngày thứ 5 của bệnh (giai đoạn nguy hiểm khi hạ sốt) và có đầy đủ các dấu hiệu cảnh báo: vật vã/li bì, nôn nhiều (≥ 3 lần/1 giờ hoặc ≥ 4 lần/6 giờ), đau bụng vùng gan, gan to > 2 cm, Hct tăng cao kèm tiểu cầu giảm nhanh. Tuy nhiên, huyết áp còn bình thường (100/70 mmHg), chi ấm, CRT < 2s nên chưa vào sốc. Theo phác đồ của Bộ Y tế Việt Nam, bệnh nhân được chỉ định truyền dịch đẳng trương (Ringer Lactate hoặc NaCl 0.9%) liều 6 - 7 mL/kg/giờ trong 1 - 2 giờ đầu.",
+                reference: "Hướng dẫn chẩn đoán, điều trị Sốt xuất huyết Dengue - Bộ Y tế Việt Nam."
+            }
+        ];
+
+        // =========================================================================
+        // 2. DỮ LIỆU TRA CỨU GIÁ TRỊ THAM CHIẾU XÉT NGHIỆM (LAB VALUES MODAL)
+        // =========================================================================
+        const LAB_REFERENCE_DATA = [
+            {
+                category: "Huyết học & Đông máu",
+                items: [
+                    { name: "Hemoglobin (Hb)", range: "Nam: 135 - 175 g/L | Nữ: 120 - 160 g/L" },
+                    { name: "Hematocrit (Hct)", range: "Nam: 41 - 53% | Nữ: 36 - 46% | Trẻ em: 36 - 40%" },
+                    { name: "Bạch cầu (WBC)", range: "4.0 - 10.0 G/L (NEU: 45-75%, LYM: 20-40%)" },
+                    { name: "Tiểu cầu (PLT)", range: "150 - 400 G/L" },
+                    { name: "INR / PT%", range: "INR: 0.8 - 1.2 | PT: 70 - 140%" },
+                    { name: "D-dimer", range: "< 500 ng/mL (FEU)" }
+                ]
+            },
+            {
+                category: "Sinh hóa máu & Điện giải",
+                items: [
+                    { name: "Natri (Na+)", range: "135 - 145 mmol/L" },
+                    { name: "Kali (K+)", range: "3.5 - 5.0 mmol/L" },
+                    { name: "Clo (Cl-)", range: "98 - 107 mmol/L" },
+                    { name: "Glucose lúc đói", range: "3.9 - 5.5 mmol/L (70 - 99 mg/dL)" },
+                    { name: "Ure máu", range: "2.5 - 7.5 mmol/L" },
+                    { name: "Creatinin huyết thanh", range: "Nam: 62 - 106 µmol/L | Nữ: 44 - 80 µmol/L" },
+                    { name: "AST (SGOT) / ALT (SGPT)", range: "< 35 - 40 U/L" },
+                    { name: "CRP định lượng", range: "< 5.0 mg/L" }
+                ]
+            },
+            {
+                category: "Tim mạch & Khí máu động mạch (ABG)",
+                items: [
+                    { name: "Troponin T siêu nhạy (hs-cTnT)", range: "< 14 ng/L" },
+                    { name: "NT-proBNP", range: "< 125 pg/mL (< 75 tuổi)" },
+                    { name: "pH máu động mạch", range: "7.35 - 7.45" },
+                    { name: "PaCO2", range: "35 - 45 mmHg" },
+                    { name: "PaO2", range: "80 - 100 mmHg (khí trời)" },
+                    { name: "HCO3- (Bicarbonat)", range: "22 - 26 mmol/L" },
+                    { name: "Lactate máu", range: "0.5 - 2.2 mmol/L" }
+                ]
+            }
+        ];
+
+        // =========================================================================
+        // 3. QUẢN LÝ TRẠNG THÁI ỨNG DỤNG (STATE MANAGEMENT)
+        // =========================================================================
+        let allQuestions = [...DEFAULT_QUESTIONS];
+        let filteredQuestions = [...allQuestions];
+        let currentIndex = 0;
+        let fontSizeLevel = 0; // -1, 0, 1, 2
+        let highlightAbnormal = true;
+        let showHint = false;
+
+        // Per-question user state:
+        // MCQ: { selected: 'A'|null, eliminated: [], checked: boolean, flagged: boolean }
+        // SAQ: { text: '', checked: boolean, selfPassed: boolean|null, flagged: boolean }
+        let userProgress = {};
+
+        // Study Stopwatch (count-up)
+        let elapsedSeconds = 0;
+        let stopwatchInterval = null;
+        let isStopwatchPaused = false;
+
+        // =========================================================================
+        // 4. KHỞI TẠO & RENDER GIAO DIỆN
+        // =========================================================================
+        function initApp() {
+            initUserProgress();
+            renderLabReferenceModal();
+            renderCurrentQuestion();
+            startStopwatch();
+        }
+
+        function initUserProgress() {
+            allQuestions.forEach(q => {
+                if (!userProgress[q.id]) {
+                    userProgress[q.id] = {
+                        selected: null,
+                        eliminated: [],
+                        text: "",
+                        checked: false,
+                        selfPassed: null,
+                        flagged: false
+                    };
+                }
+            });
+        }
+
+        function renderCurrentQuestion() {
+            if (filteredQuestions.length === 0) return;
+
+            const q = filteredQuestions[currentIndex];
+            const state = userProgress[q.id];
+            const isSaq = q.type === 'saq';
+
+            // 1. Update Header Info & Live Score
+            document.getElementById('question-counter').textContent = `Câu ${currentIndex + 1} / ${filteredQuestions.length}`;
+            document.getElementById('current-q-id').textContent = `ID: #${q.id}`;
+            updateLiveScoreBadge();
+
+            // 2. Update Specialty & Question Type Badges
+            const specBadge = document.getElementById('q-specialty-badge');
+            specBadge.textContent = q.specialty;
+            specBadge.className = "px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border ";
+            if (q.specialty === "Nội khoa") specBadge.className += "bg-blue-50 text-blue-700 border-blue-200";
+            else if (q.specialty === "Ngoại khoa") specBadge.className += "bg-emerald-50 text-emerald-700 border-emerald-200";
+            else if (q.specialty === "Sản phụ khoa") specBadge.className += "bg-pink-50 text-pink-700 border-pink-200";
+            else if (q.specialty === "Nhi khoa") specBadge.className += "bg-amber-50 text-amber-700 border-amber-200";
+            else specBadge.className += "bg-teal-50 text-teal-700 border-teal-200";
+
+            const typeBadge = document.getElementById('q-type-badge');
+            const qPillLabel = document.getElementById('question-pill-label');
+            if (isSaq) {
+                typeBadge.className = "px-2.5 py-1 rounded-full text-xs font-bold bg-purple-100 text-purple-800 border border-purple-200";
+                typeBadge.innerHTML = `<i class="fa-solid fa-pen-nib mr-1"></i>Tự luận ngắn (SAQ)`;
+                qPillLabel.className = "bg-purple-700 text-white font-bold text-xs px-2.5 py-1 rounded mt-0.5 flex-shrink-0";
+                qPillLabel.textContent = "TỰ LUẬN";
+            } else {
+                typeBadge.className = "px-2.5 py-1 rounded-full text-xs font-bold bg-sky-100 text-sky-800 border border-sky-200";
+                typeBadge.innerHTML = `<i class="fa-solid fa-list-ul mr-1"></i>Trắc nghiệm (MCQ)`;
+                qPillLabel.className = "bg-navy-900 text-white font-bold text-xs px-2.5 py-1 rounded mt-0.5 flex-shrink-0";
+                qPillLabel.textContent = "TRẮC NGHIỆM";
+            }
+
+            document.getElementById('q-topic-tag').textContent = `Chủ đề: ${q.topic || q.specialty}`;
+
+            // 3. Update Flag & Clinical Hint State
+            const flagBtn = document.getElementById('btn-flag');
+            if (state.flagged) {
+                flagBtn.classList.add('bg-amber-100', 'border-amber-400', 'text-amber-900');
+                flagBtn.innerHTML = `<i class="fa-solid fa-flag text-amber-600"></i><span>Đã cắm cờ</span>`;
+            } else {
+                flagBtn.classList.remove('bg-amber-100', 'border-amber-400', 'text-amber-900');
+                flagBtn.innerHTML = `<i class="fa-regular fa-flag text-amber-600"></i><span>Cắm cờ xem lại</span>`;
+            }
+
+            // Reset hint visibility when switching questions
+            showHint = false;
+            updateHintBoxUI(q);
+
+            // 4. Render Left Column: Clinical Vignette
+            const vignetteContainer = document.getElementById('vignette-content');
+            const paragraphs = q.vignette.split('\n').filter(p => p.trim() !== '');
+            vignetteContainer.innerHTML = paragraphs.map(p => `<p>${p}</p>`).join('');
+
+            // 5. Render Left Column: Labs Table
+            renderLabsTable(q);
+
+            // 6. Render Right Column: Lead-in Question (preserve line breaks)
+            const leadInEl = document.getElementById('lead-in-question');
+            leadInEl.innerHTML = q.question.replace(/\n/g, '<br>');
+
+            // 7. Switch between MCQ Area and SAQ Area
+            const mcqArea = document.getElementById('mcq-interaction-area');
+            const saqArea = document.getElementById('saq-interaction-area');
+
+            if (isSaq) {
+                mcqArea.classList.add('hidden');
+                saqArea.classList.remove('hidden');
+                renderSaqArea(q, state);
+            } else {
+                saqArea.classList.add('hidden');
+                mcqArea.classList.remove('hidden');
+                renderMcqOptions(q, state);
+            }
+
+            // 8. Update Action Buttons (Prev, Next, Check Answer, Retry Single)
+            document.getElementById('btn-prev').disabled = (currentIndex === 0);
+            document.getElementById('btn-next').disabled = (currentIndex === filteredQuestions.length - 1);
+
+            const checkBtn = document.getElementById('btn-check-answer');
+            const retrySingleBtn = document.getElementById('btn-retry-single');
+
+            if (state.checked) {
+                checkBtn.classList.add('hidden');
+                retrySingleBtn.classList.remove('hidden');
+            } else {
+                retrySingleBtn.classList.add('hidden');
+                checkBtn.classList.remove('hidden');
+                if (isSaq) {
+                    checkBtn.className = "px-5 py-2.5 rounded-lg bg-purple-700 hover:bg-purple-800 text-white font-semibold text-sm shadow-sm transition-all-fast flex items-center";
+                    checkBtn.innerHTML = `<i class="fa-solid fa-eye mr-2"></i>Chấm & Xem đáp án chuẩn`;
+                } else {
+                    checkBtn.className = "px-5 py-2.5 rounded-lg bg-teal-600 hover:bg-teal-700 text-white font-semibold text-sm shadow-sm transition-all-fast flex items-center";
+                    checkBtn.innerHTML = `<i class="fa-solid fa-check-double mr-2"></i>Kiểm tra đáp án`;
+                }
+            }
+
+            // 9. Render Explanation & Rubric Panel
+            renderExplanationPanel(q, state);
+            renderNavigator();
+        }
+
+        function renderLabsTable(q) {
+            const labsContainer = document.getElementById('labs-container');
+            const labsBody = document.getElementById('labs-table-body');
+
+            // Update Highlight Toggle Button UI
+            const toggleBtn = document.getElementById('btn-toggle-abnormal');
+            const toggleText = document.getElementById('highlight-abnormal-text');
+            if (highlightAbnormal) {
+                toggleBtn.className = "text-xs px-2.5 py-1 rounded-md border font-medium transition-all-fast flex items-center bg-rose-50 border-rose-200 text-rose-700";
+                toggleText.textContent = "Đang tô màu bất thường";
+            } else {
+                toggleBtn.className = "text-xs px-2.5 py-1 rounded-md border font-medium transition-all-fast flex items-center bg-white border-slate-300 text-slate-600";
+                toggleText.textContent = "Tắt tô màu bất thường";
+            }
+
+            if (q.labs && q.labs.length > 0) {
+                labsContainer.classList.remove('hidden');
+                labsBody.innerHTML = q.labs.map(lab => {
+                    let valueStyle = "text-slate-800 font-medium";
+                    let badgeHtml = "";
+
+                    if (highlightAbnormal) {
+                        if (lab.abnormal === 'high') {
+                            valueStyle = "text-rose-600 font-bold";
+                            badgeHtml = `<i class="fa-solid fa-arrow-up text-rose-600 ml-1 text-[10px]"></i>`;
+                        } else if (lab.abnormal === 'low') {
+                            valueStyle = "text-blue-600 font-bold";
+                            badgeHtml = `<i class="fa-solid fa-arrow-down text-blue-600 ml-1 text-[10px]"></i>`;
+                        }
+                    }
+
+                    return `
+                        <tr class="hover:bg-slate-100/70 transition-colors">
+                            <td class="px-4 py-2.5 text-slate-700 font-sans font-medium">${lab.name}</td>
+                            <td class="px-4 py-2.5 ${valueStyle}">${lab.value}${badgeHtml}</td>
+                            <td class="px-4 py-2.5 text-slate-500 hidden sm:table-cell">${lab.ref || '-'}</td>
+                        </tr>
+                    `;
+                }).join('');
+            } else {
+                labsContainer.classList.add('hidden');
+            }
+        }
+
+        function renderMcqOptions(q, state) {
+            const optionsList = document.getElementById('options-list');
+            const showResult = state.checked;
+
+            optionsList.innerHTML = Object.entries(q.options).map(([key, text]) => {
+                const isSelected = state.selected === key;
+                const isEliminated = state.eliminated.includes(key);
+                const isCorrect = q.correct_answer === key;
+
+                let cardClass = "group relative flex items-start justify-between p-4 rounded-xl border-2 cursor-pointer transition-all-fast select-none ";
+                let circleClass = "w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs mr-3.5 mt-0.5 flex-shrink-0 border ";
+                let statusIcon = "";
+
+                if (showResult) {
+                    if (isCorrect) {
+                        cardClass += "bg-emerald-50/90 border-emerald-500 shadow-sm ";
+                        circleClass += "bg-emerald-600 text-white border-emerald-600 ";
+                        statusIcon = `<i class="fa-solid fa-circle-check text-emerald-600 text-lg ml-2 mt-0.5"></i>`;
+                    } else if (isSelected && !isCorrect) {
+                        cardClass += "bg-rose-50/90 border-rose-500 shadow-sm ";
+                        circleClass += "bg-rose-600 text-white border-rose-600 ";
+                        statusIcon = `<i class="fa-solid fa-circle-xmark text-rose-600 text-lg ml-2 mt-0.5"></i>`;
+                    } else {
+                        cardClass += "bg-white border-slate-200 opacity-75 ";
+                        circleClass += "bg-slate-100 text-slate-600 border-slate-300 ";
+                    }
+                } else {
+                    if (isSelected) {
+                        cardClass += "bg-teal-50/70 border-teal-600 shadow-sm ";
+                        circleClass += "bg-teal-600 text-white border-teal-600 ";
+                    } else {
+                        cardClass += "bg-white border-slate-200 hover:border-slate-400 hover:bg-slate-50/50 ";
+                        circleClass += "bg-slate-100 text-slate-700 border-slate-300 group-hover:border-slate-400 ";
+                    }
+                }
+
+                if (isEliminated && !showResult) {
+                    cardClass += " option-eliminated ";
+                }
+
+                return `
+                    <div onclick="selectMcqOption('${key}')" oncontextmenu="toggleEliminateOption(event, '${key}')" class="${cardClass}">
+                        <div class="flex items-start flex-1">
+                            <span class="${circleClass}">${key}</span>
+                            <span class="option-text text-sm sm:text-base text-slate-800 leading-snug pt-0.5">${text}</span>
+                        </div>
+                        <div class="flex items-center space-x-1 ml-2">
+                            ${statusIcon}
+                            ${!showResult ? `
+                                <button type="button" onclick="toggleEliminateOption(event, '${key}')" class="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-200/70 transition-colors" title="Gạch bỏ phương án này">
+                                    <i class="fa-solid fa-strikethrough text-xs"></i>
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderSaqArea(q, state) {
+            const textarea = document.getElementById('saq-user-input');
+            textarea.value = state.text || "";
+            textarea.disabled = state.checked;
+
+            const kwContainer = document.getElementById('saq-keyword-feedback');
+            const kwBadges = document.getElementById('saq-keyword-badges');
+
+            if (state.checked && q.keywords && q.keywords.length > 0) {
+                kwContainer.classList.remove('hidden');
+                const normalizedInput = (state.text || "").toLowerCase();
+
+                kwBadges.innerHTML = q.keywords.map(kw => {
+                    const matched = normalizedInput.includes(kw.toLowerCase());
+                    if (matched) {
+                        return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200"><i class="fa-solid fa-check mr-1 text-[10px]"></i>${kw}</span>`;
+                    } else {
+                        return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-500 border border-slate-200"><i class="fa-solid fa-minus mr-1 text-[10px]"></i>Thiếu: ${kw}</span>`;
+                    }
+                }).join('');
+            } else {
+                kwContainer.classList.add('hidden');
+            }
+        }
+
+        function renderExplanationPanel(q, state) {
+            const expBox = document.getElementById('explanation-box');
+            if (!state.checked) {
+                expBox.classList.add('hidden');
+                return;
+            }
+
+            expBox.classList.remove('hidden');
+            const header = document.getElementById('explanation-header');
+            const icon = document.getElementById('explanation-icon');
+            const statusText = document.getElementById('explanation-status-text');
+            const correctBadge = document.getElementById('explanation-correct-badge');
+
+            const saqSection = document.getElementById('saq-model-answer-section');
+            const mcqSection = document.getElementById('mcq-distractors-section');
+
+            if (q.type === 'saq') {
+                // SAQ Mode UI
+                saqSection.classList.remove('hidden');
+                mcqSection.classList.add('hidden');
+
+                document.getElementById('saq-model-answer-text').innerHTML = q.model_answer.replace(/\n/g, '<br>');
+                
+                const rubricList = document.getElementById('saq-rubric-list');
+                rubricList.innerHTML = (q.rubric || []).map(item => `<li>${item}</li>`).join('');
+
+                // Style Header & Self-grade buttons
+                const btnPass = document.getElementById('btn-saq-pass');
+                const btnFail = document.getElementById('btn-saq-fail');
+
+                if (state.selfPassed === true) {
+                    header.className = "px-5 py-3 flex items-center justify-between border-b bg-emerald-50 border-emerald-200 text-emerald-800";
+                    icon.className = "fa-solid fa-circle-check text-emerald-600";
+                    statusText.textContent = "Đã tự đánh giá: ĐẠT YÊU CẦU";
+                    correctBadge.className = "text-xs font-bold px-2.5 py-1 rounded bg-emerald-200/70 text-emerald-900";
+                    correctBadge.textContent = "Tự luận ngắn (SAQ)";
+
+                    btnPass.className = "px-3.5 py-1.5 rounded-lg text-xs font-bold border bg-emerald-600 text-white border-emerald-600 shadow-sm flex items-center";
+                    btnFail.className = "px-3.5 py-1.5 rounded-lg text-xs font-bold border bg-white text-slate-600 border-slate-300 hover:bg-rose-50 flex items-center";
+                } else {
+                    header.className = "px-5 py-3 flex items-center justify-between border-b bg-rose-50 border-rose-200 text-rose-800";
+                    icon.className = "fa-solid fa-circle-xmark text-rose-600";
+                    statusText.textContent = "Đã tự đánh giá: CHƯA ĐẠT (Cần ôn lại)";
+                    correctBadge.className = "text-xs font-bold px-2.5 py-1 rounded bg-rose-200/70 text-rose-900";
+                    correctBadge.textContent = "Tự luận ngắn (SAQ)";
+
+                    btnFail.className = "px-3.5 py-1.5 rounded-lg text-xs font-bold border bg-rose-600 text-white border-rose-600 shadow-sm flex items-center";
+                    btnPass.className = "px-3.5 py-1.5 rounded-lg text-xs font-bold border bg-white text-slate-600 border-slate-300 hover:bg-emerald-50 flex items-center";
+                }
+
+            } else {
+                // MCQ Mode UI
+                saqSection.classList.add('hidden');
+                mcqSection.classList.remove('hidden');
+
+                const isUserCorrect = state.selected === q.correct_answer;
+                if (isUserCorrect) {
+                    header.className = "px-5 py-3 flex items-center justify-between border-b bg-emerald-50 border-emerald-200 text-emerald-800";
+                    icon.className = "fa-solid fa-circle-check text-emerald-600";
+                    statusText.textContent = "Chính xác! Lập luận lâm sàng chuẩn xác.";
+                    correctBadge.className = "text-xs font-bold px-2.5 py-1 rounded bg-emerald-200/70 text-emerald-900";
+                } else {
+                    header.className = "px-5 py-3 flex items-center justify-between border-b bg-rose-50 border-rose-200 text-rose-800";
+                    icon.className = "fa-solid fa-circle-xmark text-rose-600";
+                    statusText.textContent = `Chưa chính xác (Bạn đã chọn ${state.selected})`;
+                    correctBadge.className = "text-xs font-bold px-2.5 py-1 rounded bg-rose-200/70 text-rose-900";
+                }
+                correctBadge.textContent = `Đáp án đúng: ${q.correct_answer}`;
+
+                const distractorsList = document.getElementById('explanation-distractors');
+                if (q.option_analysis) {
+                    distractorsList.innerHTML = Object.entries(q.option_analysis).map(([key, analysis]) => {
+                        const isRight = key === q.correct_answer;
+                        return `
+                            <li class="flex items-start space-x-2">
+                                <span class="font-bold px-1.5 py-0.5 rounded text-xs mt-0.5 ${isRight ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-700'}">${key}</span>
+                                <span class="${isRight ? 'text-slate-900 font-medium' : 'text-slate-600'}">${analysis}</span>
+                            </li>
+                        `;
+                    }).join('');
+                } else {
+                    distractorsList.innerHTML = `<li>Đáp án đúng là <strong>${q.correct_answer}</strong>.</li>`;
+                }
+            }
+
+            document.getElementById('explanation-main').textContent = q.explanation;
+            document.getElementById('explanation-reference').textContent = q.reference || "Phác đồ điều trị Bộ Y tế & Giáo trình Y khoa Đại học.";
+        }
+
+        function renderNavigator() {
+            const navContainer = document.getElementById('question-navigator');
+            navContainer.innerHTML = filteredQuestions.map((q, idx) => {
+                const state = userProgress[q.id];
+                const isCurrent = idx === currentIndex;
+                const isSaq = q.type === 'saq';
+
+                let btnClass = "relative px-2.5 h-8 rounded-lg font-mono text-xs font-bold flex items-center justify-center space-x-1 transition-all-fast flex-shrink-0 border ";
+
+                if (state.checked) {
+                    const isPassed = isSaq ? (state.selfPassed === true) : (state.selected === q.correct_answer);
+                    if (isPassed) {
+                        btnClass += "bg-emerald-600 text-white border-emerald-400 ";
+                    } else {
+                        btnClass += "bg-rose-600 text-white border-rose-400 ";
+                    }
+                } else if (isCurrent) {
+                    btnClass += "bg-teal-600 text-white border-teal-300 ";
+                } else if ((isSaq && state.text.trim() !== "") || (!isSaq && state.selected)) {
+                    btnClass += "bg-slate-600 text-white border-slate-500 ";
+                } else {
+                    btnClass += "bg-navy-800 text-slate-300 border-slate-700 hover:bg-slate-700 ";
+                }
+
+                if (isCurrent) {
+                    btnClass += " ring-2 ring-amber-300 ";
+                }
+
+                const typeIcon = isSaq 
+                    ? `<i class="fa-solid fa-pen-nib text-[9px] opacity-80"></i>` 
+                    : `<i class="fa-solid fa-list-ul text-[9px] opacity-80"></i>`;
+
+                const flagDot = state.flagged 
+                    ? `<span class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-amber-400 rounded-full border border-navy-950"></span>` 
+                    : '';
+
+                return `
+                    <button onclick="jumpToQuestion(${idx})" class="${btnClass}" title="Câu ${idx + 1} (${isSaq ? 'Tự luận ngắn' : 'Trắc nghiệm'}) - ${q.specialty}">
+                        <span>${idx + 1}</span>
+                        ${typeIcon}
+                        ${flagDot}
+                    </button>
+                `;
+            }).join('');
+        }
+
+        function updateLiveScoreBadge() {
+            let checkedCount = 0;
+            let passedCount = 0;
+
+            allQuestions.forEach(q => {
+                const st = userProgress[q.id];
+                if (st && st.checked) {
+                    checkedCount++;
+                    const isPassed = q.type === 'saq' ? (st.selfPassed === true) : (st.selected === q.correct_answer);
+                    if (isPassed) passedCount++;
+                }
+            });
+
+            document.getElementById('live-score-pill').textContent = `Đã đạt: ${passedCount}/${checkedCount}`;
+        }
+
+        // =========================================================================
+        // 5. TƯƠNG TÁC NGƯỜI DÙNG (MCQ, SAQ, GỢI Ý, BỘ LỌC)
+        // =========================================================================
+        function selectMcqOption(optionKey) {
+            const q = filteredQuestions[currentIndex];
+            if (q.type !== 'mcq') return;
+            const state = userProgress[q.id];
+            if (state.checked) return;
+
+            state.selected = optionKey;
+            state.eliminated = state.eliminated.filter(k => k !== optionKey);
+            renderCurrentQuestion();
+        }
+
+        function toggleEliminateOption(event, optionKey) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            const q = filteredQuestions[currentIndex];
+            if (q.type !== 'mcq') return;
+            const state = userProgress[q.id];
+            if (state.checked) return;
+
+            if (state.eliminated.includes(optionKey)) {
+                state.eliminated = state.eliminated.filter(k => k !== optionKey);
+            } else {
+                state.eliminated.push(optionKey);
+                if (state.selected === optionKey) state.selected = null;
+            }
+            renderCurrentQuestion();
+        }
+
+        function handleSaqInput(value) {
+            const q = filteredQuestions[currentIndex];
+            userProgress[q.id].text = value;
+            renderNavigator();
+        }
+
+        function checkCurrentAnswer() {
+            const q = filteredQuestions[currentIndex];
+            const state = userProgress[q.id];
+
+            if (q.type === 'mcq') {
+                if (!state.selected) {
+                    showToast("Vui lòng chọn một phương án (A, B, C hoặc D) trước khi kiểm tra!", "warning");
+                    return;
+                }
+                state.checked = true;
+            } else {
+                // SAQ grading
+                if (!state.text || state.text.trim().length < 2) {
+                    showToast("Vui lòng nhập câu trả lời tự luận ngắn trước khi đối chiếu đáp án!", "warning");
+                    document.getElementById('saq-user-input').focus();
+                    return;
+                }
+                state.checked = true;
+
+                // Auto-suggest pass/fail based on keyword match (>= 50% keywords matched)
+                if (q.keywords && q.keywords.length > 0) {
+                    const lowerInput = state.text.toLowerCase();
+                    const matchedCount = q.keywords.filter(kw => lowerInput.includes(kw.toLowerCase())).length;
+                    state.selfPassed = (matchedCount / q.keywords.length) >= 0.5;
+                } else {
+                    state.selfPassed = true;
+                }
+            }
+
+            renderCurrentQuestion();
+
+            if (window.innerWidth < 1024) {
+                document.getElementById('explanation-box').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }
+
+        function setSaqSelfGrade(passed) {
+            const q = filteredQuestions[currentIndex];
+            if (q.type !== 'saq') return;
+            userProgress[q.id].selfPassed = passed;
+            renderCurrentQuestion();
+            showToast(passed ? "Đã ghi nhận: Đạt yêu cầu!" : "Đã ghi nhận: Cần ôn tập lại câu này.", passed ? "info" : "warning");
+        }
+
+        function retryCurrentQuestion() {
+            const q = filteredQuestions[currentIndex];
+            userProgress[q.id] = {
+                selected: null,
+                eliminated: [],
+                text: "",
+                checked: false,
+                selfPassed: null,
+                flagged: userProgress[q.id].flagged
+            };
+            renderCurrentQuestion();
+            showToast("Đã làm mới câu hỏi hiện tại.", "info");
+        }
+
+        function toggleClinicalHint() {
+            const q = filteredQuestions[currentIndex];
+            showHint = !showHint;
+            updateHintBoxUI(q);
+        }
+
+        function updateHintBoxUI(q) {
+            const hintBox = document.getElementById('clinical-hint-box');
+            const hintText = document.getElementById('clinical-hint-text');
+            const hintBtn = document.getElementById('btn-hint');
+
+            if (showHint) {
+                hintText.textContent = q.hint || "Hãy phân tích kỹ các triệu chứng cơ năng, thực thể và các chỉ số xét nghiệm bất thường ở cột bên trái.";
+                hintBox.classList.remove('hidden');
+                hintBtn.classList.add('bg-amber-200', 'border-amber-400');
+            } else {
+                hintBox.classList.add('hidden');
+                hintBtn.classList.remove('bg-amber-200', 'border-amber-400');
+            }
+        }
+
+        function toggleHighlightAbnormal() {
+            highlightAbnormal = !highlightAbnormal;
+            renderLabsTable(filteredQuestions[currentIndex]);
+        }
+
+        function toggleFlagCurrent() {
+            const q = filteredQuestions[currentIndex];
+            userProgress[q.id].flagged = !userProgress[q.id].flagged;
+            renderCurrentQuestion();
+        }
+
+        function prevQuestion() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                renderCurrentQuestion();
+                resetScrollPositions();
+            }
+        }
+
+        function nextQuestion() {
+            if (currentIndex < filteredQuestions.length - 1) {
+                currentIndex++;
+                renderCurrentQuestion();
+                resetScrollPositions();
+            }
+        }
+
+        function jumpToQuestion(index) {
+            currentIndex = index;
+            renderCurrentQuestion();
+            resetScrollPositions();
+        }
+
+        function resetScrollPositions() {
+            document.getElementById('vignette-pane').scrollTop = 0;
+            document.getElementById('question-pane').scrollTop = 0;
+        }
+
+        // =========================================================================
+        // 6. BỘ LỌC CHUYÊN KHOA & DẠNG CÂU HỎI
+        // =========================================================================
+        function applyFilters() {
+            const specVal = document.getElementById('specialty-filter').value;
+            const typeVal = document.getElementById('type-filter').value;
+
+            const result = allQuestions.filter(q => {
+                const matchSpec = (specVal === 'ALL') || (q.specialty === specVal);
+                const matchType = (typeVal === 'ALL') || (q.type === typeVal);
+                return matchSpec && matchType;
+            });
+
+            if (result.length === 0) {
+                showToast("Không tìm thấy câu hỏi phù hợp với bộ lọc hiện tại.", "warning");
+                document.getElementById('specialty-filter').value = 'ALL';
+                document.getElementById('type-filter').value = 'ALL';
+                filteredQuestions = [...allQuestions];
+            } else {
+                filteredQuestions = result;
+            }
+
+            currentIndex = 0;
+            renderCurrentQuestion();
+        }
+
+        function changeFontSize(delta) {
+            if (delta === 0) fontSizeLevel = 0;
+            else fontSizeLevel = Math.max(-1, Math.min(2, fontSizeLevel + delta));
+
+            const container = document.getElementById('vignette-content');
+            container.classList.remove('text-sm', 'text-base', 'text-lg', 'text-xl');
+            
+            if (fontSizeLevel === -1) container.classList.add('text-sm');
+            else if (fontSizeLevel === 0) container.classList.add('text-base');
+            else if (fontSizeLevel === 1) container.classList.add('text-lg');
+            else if (fontSizeLevel === 2) container.classList.add('text-xl');
+        }
+
+        // =========================================================================
+        // 7. ĐỒNG HỒ BẤM GIỜ LUYỆN TẬP (STOPWATCH)
+        // =========================================================================
+        function startStopwatch() {
+            clearInterval(stopwatchInterval);
+            stopwatchInterval = setInterval(() => {
+                if (!isStopwatchPaused) {
+                    elapsedSeconds++;
+                    updateStopwatchDisplay();
+                }
+            }, 1000);
+        }
+
+        function updateStopwatchDisplay() {
+            const mins = Math.floor(elapsedSeconds / 60);
+            const secs = elapsedSeconds % 60;
+            document.getElementById('stopwatch-display').textContent = 
+                `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        }
+
+        function toggleStopwatch() {
+            isStopwatchPaused = !isStopwatchPaused;
+            const btn = document.getElementById('btn-timer-toggle');
+            btn.innerHTML = isStopwatchPaused ? `<i class="fa-solid fa-play text-emerald-400"></i>` : `<i class="fa-solid fa-pause"></i>`;
+            showToast(isStopwatchPaused ? "Đã tạm dừng đồng hồ luyện tập" : "Tiếp tục tính giờ", "info");
+        }
+
+        // =========================================================================
+        // 8. MÀN HÌNH TỔNG KẾT LUYỆN THI (REVIEW DASHBOARD)
+        // =========================================================================
+        function openReviewDashboard() {
+            let totalPassed = 0;
+            let mcqTotal = 0, mcqPassed = 0;
+            let saqTotal = 0, saqPassed = 0;
+            const specStats = {};
+            let wrongCount = 0;
+
+            allQuestions.forEach(q => {
+                const st = userProgress[q.id];
+                const isSaq = q.type === 'saq';
+                const isPassed = st.checked && (isSaq ? (st.selfPassed === true) : (st.selected === q.correct_answer));
+
+                if (isPassed) totalPassed++;
+                if (st.checked && !isPassed) wrongCount++;
+
+                if (isSaq) {
+                    saqTotal++;
+                    if (isPassed) saqPassed++;
+                } else {
+                    mcqTotal++;
+                    if (isPassed) mcqPassed++;
+                }
+
+                const spec = q.specialty || "Khác";
+                if (!specStats[spec]) specStats[spec] = { total: 0, passed: 0 };
+                specStats[spec].total++;
+                if (isPassed) specStats[spec].passed++;
+            });
+
+            const total = allQuestions.length;
+            const pct = total > 0 ? Math.round((totalPassed / total) * 100) : 0;
+
+            document.getElementById('dash-total-score').textContent = `${totalPassed}/${total}`;
+            document.getElementById('dash-total-percent').textContent = `${pct}%`;
+            document.getElementById('dash-mcq-score').textContent = `${mcqPassed}/${mcqTotal}`;
+            document.getElementById('dash-saq-score').textContent = `${saqPassed}/${saqTotal}`;
+
+            const mins = Math.floor(elapsedSeconds / 60);
+            const secs = elapsedSeconds % 60;
+            document.getElementById('dash-time-spent').textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+
+            // Render Specialty Breakdown
+            const breakdownEl = document.getElementById('dash-specialty-breakdown');
+            breakdownEl.innerHTML = Object.entries(specStats).map(([spec, stat]) => {
+                const specPct = Math.round((stat.passed / stat.total) * 100);
+                let barColor = "bg-teal-600";
+                if (specPct < 50) barColor = "bg-rose-500";
+                else if (specPct < 75) barColor = "bg-amber-500";
+                else barColor = "bg-emerald-500";
+
+                return `
+                    <div>
+                        <div class="flex justify-between text-xs font-semibold mb-1">
+                            <span class="text-slate-700">${spec}</span>
+                            <span class="text-slate-600">${stat.passed}/${stat.total} câu đạt (${specPct}%)</span>
+                        </div>
+                        <div class="w-full bg-slate-200 rounded-full h-2.5 overflow-hidden">
+                            <div class="${barColor} h-2.5 rounded-full transition-all duration-500" style="width: ${specPct}%"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Enable/disable retry wrong button
+            const retryWrongBtn = document.getElementById('btn-retry-wrong');
+            if (wrongCount > 0) {
+                retryWrongBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                retryWrongBtn.disabled = false;
+                retryWrongBtn.innerHTML = `<i class="fa-solid fa-fire-flame-curved mr-1.5"></i>Luyện lại ${wrongCount} câu chưa đạt`;
+            } else {
+                retryWrongBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                retryWrongBtn.disabled = true;
+                retryWrongBtn.innerHTML = `<i class="fa-solid fa-check mr-1.5"></i>Không có câu sai`;
+            }
+
+            openModal('dashboard-modal');
+        }
+
+        function practiceWrongQuestions() {
+            const wrongList = allQuestions.filter(q => {
+                const st = userProgress[q.id];
+                if (!st.checked) return false;
+                const isPassed = q.type === 'saq' ? (st.selfPassed === true) : (st.selected === q.correct_answer);
+                return !isPassed;
+            });
+
+            if (wrongList.length === 0) return;
+
+            // Reset progress for those wrong questions
+            wrongList.forEach(q => {
+                userProgress[q.id] = {
+                    selected: null,
+                    eliminated: [],
+                    text: "",
+                    checked: false,
+                    selfPassed: null,
+                    flagged: true
+                };
+            });
+
+            filteredQuestions = wrongList;
+            currentIndex = 0;
+            closeModal('dashboard-modal');
+            renderCurrentQuestion();
+            showToast(`Đang luyện lại ${wrongList.length} câu chưa đạt yêu cầu!`, "info");
+        }
+
+        function resetAllProgress() {
+            userProgress = {};
+            initUserProgress();
+            document.getElementById('specialty-filter').value = 'ALL';
+            document.getElementById('type-filter').value = 'ALL';
+            filteredQuestions = [...allQuestions];
+            currentIndex = 0;
+            elapsedSeconds = 0;
+            updateStopwatchDisplay();
+            closeModal('dashboard-modal');
+            renderCurrentQuestion();
+            showToast("Đã làm mới toàn bộ tiến độ luyện thi!", "info");
+        }
+
+        // =========================================================================
+        // 9. TRA CỨU XÉT NGHIỆM & NHẬP ĐỀ JSON (MCQ + SAQ)
+        // =========================================================================
+        function renderLabReferenceModal(filterText = "") {
+            const container = document.getElementById('lab-reference-content');
+            const query = filterText.toLowerCase().trim();
+
+            container.innerHTML = LAB_REFERENCE_DATA.map(group => {
+                const matchedItems = group.items.filter(item => 
+                    item.name.toLowerCase().includes(query) || item.range.toLowerCase().includes(query)
+                );
+                if (matchedItems.length === 0) return '';
+
+                return `
+                    <div>
+                        <h4 class="font-bold text-xs uppercase tracking-wider text-teal-700 mb-2 border-b border-slate-200 pb-1">
+                            ${group.category}
+                        </h4>
+                        <div class="divide-y divide-slate-100">
+                            ${matchedItems.map(item => `
+                                <div class="py-2 flex flex-col sm:flex-row sm:justify-between gap-1">
+                                    <span class="font-medium text-slate-800">${item.name}</span>
+                                    <span class="font-mono text-xs text-slate-600 bg-slate-100 px-2 py-0.5 rounded self-start sm:self-auto">${item.range}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('') || `<p class="text-center text-slate-500 py-6">Không tìm thấy chỉ số xét nghiệm phù hợp.</p>`;
+        }
+
+        function filterLabReference() {
+            renderLabReferenceModal(document.getElementById('lab-search-input').value);
+        }
+
+        function fillSampleJsonTemplate() {
+            const sample = [
+                {
+                    id: "AI-MCQ-01",
+                    type: "mcq",
+                    specialty: "Nội khoa",
+                    topic: "Rối loạn nhịp tim",
+                    vignette: "Bệnh nhân nữ 68 tuổi nhập viện vì hồi hộp đánh trống ngực từ 2 giờ nay. Khám: mạch không đều 145 lần/phút, huyết áp 115/70 mmHg, phổi không ran. ECG ghi nhận nhịp nhanh phức bộ QRS hẹp, không thấy sóng P rõ ràng, khoảng R-R hoàn toàn không đều.",
+                    labs: [
+                        { name: "TSH", value: "0.02 mIU/L (Giảm)", ref: "0.4 - 4.0 mIU/L", abnormal: "low" }
+                    ],
+                    hint: "Phức bộ QRS hẹp + mất sóng P + khoảng R-R hoàn toàn không đều.",
+                    question: "Chẩn đoán điện tâm đồ và bước xử trí kiểm soát tần số thất ban đầu phù hợp nhất là gì?",
+                    options: {
+                        "A": "Rung nhĩ đáp ứng thất nhanh — Tiêm tĩnh mạch Metoprolol hoặc Diltiazem để kiểm soát tần số thất",
+                        "B": "Cuồng nhĩ dẫn truyền 2:1 — Sốc điện chuyển nhịp đồng bộ 200J ngay lập tức",
+                        "C": "Nhịp nhanh kịch phát trên thất — Tiêm tĩnh mạch nhanh Adenosine 6 mg",
+                        "D": "Nhịp nhanh thất đa hình — Truyền tĩnh mạch Magnesium sulfate 2g"
+                    },
+                    correct_answer: "A",
+                    explanation: "ECG có phức bộ QRS hẹp, mất sóng P và khoảng R-R không đều hoàn toàn là tiêu chuẩn vàng của Rung nhĩ, có yếu tố thúc đẩy là cường giáp.",
+                    option_analysis: {
+                        "A": "Đúng. Kiểm soát tần số thất bằng chẹn beta rất phù hợp đặc biệt khi có cường giáp kèm theo.",
+                        "B": "Sai. Cuồng nhĩ có khoảng R-R đều và sóng răng cưa.",
+                        "C": "Sai. SVT có nhịp đều đặn.",
+                        "D": "Sai. Phức bộ QRS hẹp loại trừ nhịp nhanh thất."
+                    },
+                    reference: "Khuyến cáo ESC 2024 về Quản lý Rung nhĩ."
+                },
+                {
+                    id: "AI-SAQ-01",
+                    type: "saq",
+                    specialty: "Nội khoa",
+                    topic: "Hô hấp - Cấp cứu",
+                    vignette: "Bệnh nhân nam 64 tuổi tiền sử COPD nhóm E nhập viện vì khó thở tăng dần, khạc đàm đục tăng số lượng từ 2 ngày nay. Khám: thở co kéo cơ hô hấp phụ, SpO2 85% (khí trời), phổi ran rít ran ngáy hai bên.",
+                    labs: [
+                        { name: "pH máu động mạch", value: "7.28 (Giảm)", ref: "7.35 - 7.45", abnormal: "low" },
+                        { name: "PaCO2", value: "64 mmHg (Tăng)", ref: "35 - 45 mmHg", abnormal: "high" }
+                    ],
+                    hint: "Đợt cấp COPD nặng có toan hô hấp (pH < 7.35, PaCO2 > 45 mmHg) nhưng bệnh nhân còn tỉnh táo.",
+                    question: "1) Nêu mục tiêu SpO2 cần duy trì ở bệnh nhân này.\n2) Phương thức hỗ trợ thông khí ưu tiên hàng đầu hiện tại là gì?",
+                    model_answer: "1) Mục tiêu SpO2: 88 - 92%.\n2) Hỗ trợ thông khí ưu tiên: Thông khí nhân tạo không xâm nhập áp lực dương (NIV / BiPAP).",
+                    keywords: ["88", "92", "không xâm nhập", "niv", "bipap"],
+                    rubric: [
+                        "Nêu đúng ngưỡng mục tiêu SpO2: 88 - 92% (tránh tăng CO2 máu nặng thêm).",
+                        "Chỉ định đúng thông khí không xâm nhập (NIV / BiPAP) vì pH 7.25 - 7.35 và PaCO2 > 45 mmHg."
+                    ],
+                    explanation: "Ở bệnh nhân đợt cấp COPD có suy hô hấp tăng thán khí (pH < 7.35 và PaCO2 > 45 mmHg), thở oxy liều thấp kiểm soát SpO2 đạt 88-92% kết hợp thông khí không xâm nhập (NIV/BiPAP) giúp giảm công hô hấp và giảm tỷ lệ phải đặt nội khí quản.",
+                    reference: "GOLD Report 2024 - Quản lý đợt cấp COPD."
+                }
+            ];
+            document.getElementById('json-input-area').value = JSON.stringify(sample, null, 2);
+            document.getElementById('json-error-msg').classList.add('hidden');
+        }
+
+        function importJsonQuestions() {
+            const raw = document.getElementById('json-input-area').value.trim();
+            const errBox = document.getElementById('json-error-msg');
+            errBox.classList.add('hidden');
+
+            if (!raw) {
+                errBox.textContent = "Vui lòng dán dữ liệu JSON trước khi nạp đề.";
+                errBox.classList.remove('hidden');
+                return;
+            }
+
+            try {
+                const parsed = JSON.parse(raw);
+                const list = Array.isArray(parsed) ? parsed : [parsed];
+                if (list.length === 0) throw new Error("Mảng JSON rỗng.");
+
+                const validated = list.map((item, idx) => {
+                    const qType = (item.type || "mcq").toLowerCase();
+                    if (!item.vignette || !item.question) {
+                        throw new Error(`Câu số ${idx + 1} thiếu trường vignette hoặc question.`);
+                    }
+                    if (qType === 'mcq' && (!item.options || !item.correct_answer)) {
+                        throw new Error(`Câu trắc nghiệm số ${idx + 1} thiếu options hoặc correct_answer.`);
+                    }
+                    if (qType === 'saq' && !item.model_answer) {
+                        throw new Error(`Câu tự luận ngắn số ${idx + 1} thiếu model_answer.`);
+                    }
+
+                    return {
+                        id: item.id || `JSON-${idx + 1}`,
+                        type: qType,
+                        specialty: item.specialty || "Nội khoa",
+                        topic: item.topic || "Tổng hợp",
+                        vignette: item.vignette,
+                        labs: Array.isArray(item.labs) ? item.labs : [],
+                        hint: item.hint || "",
+                        question: item.question,
+                        options: item.options || {},
+                        correct_answer: (item.correct_answer || "").toUpperCase(),
+                        model_answer: item.model_answer || "",
+                        keywords: Array.isArray(item.keywords) ? item.keywords : [],
+                        rubric: Array.isArray(item.rubric) ? item.rubric : [],
+                        explanation: item.explanation || "Chưa có giải thích chi tiết.",
+                        option_analysis: item.option_analysis || null,
+                        reference: item.reference || "Tài liệu y khoa cập nhật."
+                    };
+                });
+
+                allQuestions = validated;
+                filteredQuestions = [...allQuestions];
+                document.getElementById('specialty-filter').value = 'ALL';
+                document.getElementById('type-filter').value = 'ALL';
+                userProgress = {};
+                initUserProgress();
+                currentIndex = 0;
+                elapsedSeconds = 0;
+                updateStopwatchDisplay();
+                renderCurrentQuestion();
+                closeModal('import-modal');
+                showToast(`Đã nạp thành công ${validated.length} câu hỏi luyện thi mới!`, "info");
+
+            } catch (err) {
+                errBox.textContent = "Lỗi định dạng JSON: " + err.message;
+                errBox.classList.remove('hidden');
+            }
+        }
+
+        function resetToDefaultQuestions() {
+            allQuestions = [...DEFAULT_QUESTIONS];
+            filteredQuestions = [...allQuestions];
+            document.getElementById('specialty-filter').value = 'ALL';
+            document.getElementById('type-filter').value = 'ALL';
+            userProgress = {};
+            initUserProgress();
+            currentIndex = 0;
+            elapsedSeconds = 0;
+            updateStopwatchDisplay();
+            renderCurrentQuestion();
+            closeModal('import-modal');
+            showToast("Đã khôi phục 8 câu hỏi mẫu (4 Trắc nghiệm + 4 Tự luận ngắn).", "info");
+        }
+
+        // =========================================================================
+        // 10. TIỆN ÍCH MODAL, TOAST & PHÍM TẮT BÀN PHÍM
+        // =========================================================================
+        function openModal(id) {
+            document.getElementById(id).classList.remove('hidden');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+
+        let toastTimeout = null;
+        function showToast(message, type = "info") {
+            const toast = document.getElementById('toast-notification');
+            const icon = document.getElementById('toast-icon');
+            const msgEl = document.getElementById('toast-message');
+
+            msgEl.textContent = message;
+            icon.className = type === 'warning' 
+                ? "fa-solid fa-triangle-exclamation text-amber-400" 
+                : "fa-solid fa-circle-info text-teal-400";
+
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3200);
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) return;
+
+            const currentQ = filteredQuestions[currentIndex];
+            if (!currentQ) return;
+
+            if (e.key === 'ArrowRight') nextQuestion();
+            else if (e.key === 'ArrowLeft') prevQuestion();
+            else if (currentQ.type === 'mcq') {
+                if (['a', 'A', '1'].includes(e.key)) selectMcqOption('A');
+                else if (['b', 'B', '2'].includes(e.key)) selectMcqOption('B');
+                else if (['c', 'C', '3'].includes(e.key)) selectMcqOption('C');
+                else if (['d', 'D', '4'].includes(e.key)) selectMcqOption('D');
+            }
+            if (e.key === 'Enter' && !userProgress[currentQ.id].checked) {
+                checkCurrentAnswer();
+            }
+        });
+
+        window.onload = initApp;
+    </script>
+</body>
+</html>
